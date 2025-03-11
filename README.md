@@ -1,3 +1,4 @@
 # GymPoint
 GymPoint – інформаційна веб-система, яка дозволяє розширити робочу область спортзалу та спростити роботу адміністратора рецепції спортзалу - продавати абонементи та товари онлайн, запис до певного тренера та покращити комунікацію між тренером та його клієнтами.
-Desing - https://www.figma.com/design/C3AFZjMPKOYPTaqO0FHiKs/GymPoint?node-id=0-1&t=200AkXv4BVl5z28Z-1
+
+Design - https://www.figma.com/design/C3AFZjMPKOYPTaqO0FHiKs/GymPoint?node-id=0-1&t=200AkXv4BVl5z28Z-1

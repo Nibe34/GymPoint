@@ -1,7 +1,7 @@
 package gympoint.backend.userservice.dto;
 
 
-public class TrainerProfileRequest {
+public class TrainerProfileDto {
     private String bio;
     private String specialization;
     private int rating;

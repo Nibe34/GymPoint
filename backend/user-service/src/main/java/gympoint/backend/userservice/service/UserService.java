@@ -1,12 +1,16 @@
 package gympoint.backend.userservice.service;
 
 
-import gympoint.backend.userservice.dto.UserRegistrationRequest;
-import gympoint.backend.userservice.dto.UserResponse;
-import gympoint.backend.userservice.dto.UserUpdateRequest;
+import gympoint.backend.userservice.entity.User;
+
+import java.util.List;
+import java.util.Optional;
 
 public interface UserService {
-    UserResponse register(UserRegistrationRequest request);
-    UserResponse getCurrentUser();
-    UserResponse updateCurrentUser(UserUpdateRequest request);
+    User create(User user);
+    Optional<User> getById(Long id);
+    List<User> getAllUsers();
+    User update(Long id, User updatedUser);
+    void delete(Long id);
+    Optional<User> findByEmail(String email);
 }

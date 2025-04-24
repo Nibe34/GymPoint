@@ -2,9 +2,11 @@ package gympoint.backend.userservice.entity;
 
 
 import jakarta.persistence.*;
+import lombok.Setter;
 
 import java.time.LocalDate;
 
+@Setter
 @Entity
 @Table(name = "client_profiles")
 public class ClientProfile {

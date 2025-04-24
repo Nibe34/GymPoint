@@ -3,6 +3,6 @@ package gympoint.backend.userservice.dto;
 
 import java.time.LocalDate;
 
-public class ClientProfileResponse {
+public class ClientProfileDto {
     private LocalDate dateOfBirth;
 }

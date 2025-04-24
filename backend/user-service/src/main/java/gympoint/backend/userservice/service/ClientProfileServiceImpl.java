@@ -1,38 +1,36 @@
 package gympoint.backend.userservice.service;
 
 
-import gympoint.backend.userservice.dto.ClientProfileResponse;
-import gympoint.backend.userservice.dto.ClientProfileUpdateRequest;
 import gympoint.backend.userservice.entity.ClientProfile;
-import gympoint.backend.userservice.entity.User;
-import gympoint.backend.userservice.mapper.ClientProfileMapper;
-import gympoint.backend.userservice.repository.UserRepository;
+import gympoint.backend.userservice.repository.ClientProfileRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 public class ClientProfileServiceImpl implements ClientProfileService {
-
-    private final UserRepository userRepository;
-    private final ClientProfileMapper clientProfileMapper;
+    private final ClientProfileRepository clientProfileRepository;
 
     @Override
-    public ClientProfileResponse getByUserId(Long userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
-        return clientProfileMapper.toResponse(user.getClientProfile());
+    public ClientProfile create(ClientProfile profile) {
+        return clientProfileRepository.save(profile);
     }
 
     @Override
-    public void updateProfile(Long userId, ClientProfileUpdateRequest request) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+    public Optional<ClientProfile> getById(Long Id) {
+        return clientProfileRepository.findById(Id);
+    }
 
-        ClientProfile profile = user.getClientProfile();
-        if (profile == null) throw new RuntimeException("Client profile not found");
+    @Override
+    public ClientProfile update(Long Id, ClientProfile updatedProfile) {
+        updatedProfile.setId(Id);
+        return clientProfileRepository.save(updatedProfile);
+    }
 
-        clientProfileMapper.updateFromDto(request, profile);
-        userRepository.save(user);
+    @Override
+    public void delete(Long userId) {
+        clientProfileRepository.deleteById(userId);
     }
 }

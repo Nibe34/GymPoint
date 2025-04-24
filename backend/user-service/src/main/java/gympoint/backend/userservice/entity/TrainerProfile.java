@@ -2,7 +2,9 @@ package gympoint.backend.userservice.entity;
 
 
 import jakarta.persistence.*;
+import lombok.Setter;
 
+@Setter
 @Entity
 @Table(name = "trainer_profiles")
 public class TrainerProfile {
@@ -14,7 +16,7 @@ public class TrainerProfile {
     @Column(unique = false, nullable = false)
     private String specialization;
     @Column(unique = false, nullable = false)
-    private int rating;
+    private float rating;
 
 
     @OneToOne

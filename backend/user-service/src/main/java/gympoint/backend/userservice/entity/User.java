@@ -28,7 +28,7 @@ public class User {
     @Column(nullable = false)
     private Role role;
 
-
+    // inheritence mapping
     @JoinColumn(nullable = true)
     @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
     private ClientProfile clientProfile;

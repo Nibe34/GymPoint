@@ -1,38 +1,36 @@
 package gympoint.backend.userservice.service;
 
 
-import gympoint.backend.userservice.dto.TrainerProfileResponse;
-import gympoint.backend.userservice.dto.TrainerProfileUpdateRequest;
 import gympoint.backend.userservice.entity.TrainerProfile;
-import gympoint.backend.userservice.entity.User;
-import gympoint.backend.userservice.mapper.TrainerProfileMapper;
-import gympoint.backend.userservice.repository.UserRepository;
+import gympoint.backend.userservice.repository.TrainerProfileRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 public class TrainerProfileServiceImpl implements TrainerProfileService {
-
-    private final UserRepository userRepository;
-    private final TrainerProfileMapper trainerProfileMapper;
+    private final TrainerProfileRepository trainerProfileRepository;
 
     @Override
-    public TrainerProfileResponse getByUserId(Long userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
-        return trainerProfileMapper.toResponse(user.getTrainerProfile());
+    public TrainerProfile create(TrainerProfile profile) {
+        return trainerProfileRepository.save(profile);
     }
 
     @Override
-    public void updateProfile(Long userId, TrainerProfileUpdateRequest request) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+    public Optional<TrainerProfile> getById(Long Id) {
+        return trainerProfileRepository.findById(Id);
+    }
 
-        TrainerProfile profile = user.getTrainerProfile();
-        if (profile == null) throw new RuntimeException("Trainer profile not found");
+    @Override
+    public TrainerProfile update(Long Id, TrainerProfile updatedProfile) {
+        updatedProfile.setId(Id);
+        return trainerProfileRepository.save(updatedProfile);
+    }
 
-        trainerProfileMapper.updateFromDto(request, profile);
-        userRepository.save(user);
+    @Override
+    public void delete(Long userId) {
+        trainerProfileRepository.deleteById(userId);
     }
 }

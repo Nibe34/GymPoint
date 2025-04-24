@@ -12,6 +12,6 @@ public class UserRegistrationRequest {
     private String lastName;
     private Role role;
 
-    private TrainerProfileRequest trainerProfile;
-    private ClientProfileRequest clientProfile;
+    private TrainerProfileDto trainerProfile;
+    private ClientProfileDto clientProfile;
 }

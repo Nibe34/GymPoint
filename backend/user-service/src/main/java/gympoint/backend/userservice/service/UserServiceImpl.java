@@ -1,64 +1,49 @@
 package gympoint.backend.userservice.service;
 
 
-import gympoint.backend.common.enums.Role;
-import gympoint.backend.userservice.dto.*;
 import gympoint.backend.userservice.entity.User;
-import gympoint.backend.userservice.mapper.*;
 import gympoint.backend.userservice.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.Optional;
+
+
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
-
     private final UserRepository userRepository;
-    private final ClientProfileMapper clientProfileMapper;
-    private final TrainerProfileMapper trainerProfileMapper;
-    private final UserMapper userMapper;
 
     @Override
-    public UserResponse register(UserRegistrationRequest request) {
-        User user = userMapper.toEntity(request);
+    public List<User> getAllUsers() {
+        return userRepository.findAll();
+    }
 
-        if (request.getRole() == Role.CLIENT && request.getClientProfile() != null) {
-            user.setClientProfile(clientProfileMapper.toEntity(request.getClientProfile()));
-        }
 
-        if (request.getRole() == Role.TRAINER && request.getTrainerProfile() != null) {
-            user.setTrainerProfile(trainerProfileMapper.toEntity(request.getTrainerProfile()));
-        }
-
-        User savedUser = userRepository.save(user);
-        return userMapper.toResponse(savedUser);
+    @Override
+    public User update(Long id, User updatedUser) {
+        updatedUser.setId(id);
+        return userRepository.save(updatedUser);
     }
 
     @Override
-    public UserResponse getCurrentUser() {
-        // TODO зробити хендлер
-        User user = userRepository.findById(1L)
-                .orElseThrow(() -> new RuntimeException("User not found"));
-        return userMapper.toResponse(user);
+    public User create(User user) {
+        return userRepository.save(user);
     }
 
     @Override
-    public UserResponse updateCurrentUser(UserUpdateRequest request) {
-        User user = userRepository.findById(1L)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+    public Optional<User> getById(Long id) {
+        return userRepository.findById(id);
+    }
 
-        if (request.getFirstName() != null) user.setFirstName(request.getFirstName());
-        if (request.getLastName() != null) user.setLastName(request.getLastName());
+    @Override
+    public void delete(Long id) {
+        userRepository.deleteById(id);
+    }
 
-        if (user.getRole() == Role.CLIENT && request.getClientProfileUpdateRequest() != null) {
-            clientProfileMapper.updateFromDto(request.getClientProfileUpdateRequest(), user.getClientProfile());
-        }
-
-        if (user.getRole() == Role.TRAINER && request.getTrainerProfileUpdateRequest() != null) {
-            trainerProfileMapper.updateFromDto(request.getTrainerProfileUpdateRequest(), user.getTrainerProfile());
-        }
-
-        userRepository.save(user);
-        return userMapper.toResponse(user);
+    @Override
+    public Optional<User> findByEmail(String email) {
+        return userRepository.findByEmail(email);
     }
 }

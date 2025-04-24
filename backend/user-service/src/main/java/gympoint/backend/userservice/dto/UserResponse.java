@@ -10,6 +10,6 @@ public class UserResponse {
     private String lastName;
     private Role role;
 
-    private TrainerProfileResponse trainerProfile;
-    private ClientProfileResponse clientProfile;
+    private TrainerProfileDto trainerProfile;
+    private ClientProfileDto clientProfile;
 }

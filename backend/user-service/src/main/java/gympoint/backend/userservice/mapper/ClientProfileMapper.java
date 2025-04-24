@@ -9,9 +9,9 @@ import org.mapstruct.MappingTarget;
 @Mapper(componentModel = "spring")
 public interface ClientProfileMapper {
 
-    ClientProfile toEntity(ClientProfileRequest dto);
+    ClientProfile toEntity(ClientProfileDto dto);
 
-    ClientProfileResponse toResponse(ClientProfile entity);
+    ClientProfileDto toResponse(ClientProfile entity);
 
-    void updateFromDto(ClientProfileUpdateRequest dto, @MappingTarget ClientProfile entity);
+    void updateFromDto(ClientProfileDto dto, @MappingTarget ClientProfile entity);
 }

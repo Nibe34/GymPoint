@@ -1,10 +1,13 @@
 package gympoint.backend.userservice.service;
 
 
-import gympoint.backend.userservice.dto.TrainerProfileResponse;
-import gympoint.backend.userservice.dto.TrainerProfileUpdateRequest;
+import gympoint.backend.userservice.entity.TrainerProfile;
+
+import java.util.Optional;
 
 public interface TrainerProfileService {
-    TrainerProfileResponse getByUserId(Long userId);
-    void updateProfile(Long userId, TrainerProfileUpdateRequest request);
+    TrainerProfile create(TrainerProfile profile);
+    Optional<TrainerProfile> getById(Long Id);
+    TrainerProfile update(Long userId, TrainerProfile profile);
+    void delete(Long userId);
 }

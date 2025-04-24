@@ -9,6 +9,6 @@ public class UserUpdateRequest {
     private String firstName;
     private String lastName;
 
-    private TrainerProfileUpdateRequest trainerProfileUpdateRequest;
-    private ClientProfileUpdateRequest clientProfileUpdateRequest;
+    private TrainerProfileDto trainerProfileDto;
+    private ClientProfileDto clientProfileDto;
 }

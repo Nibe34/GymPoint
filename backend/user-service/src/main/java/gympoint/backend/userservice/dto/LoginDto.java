@@ -1,7 +1,9 @@
 package gympoint.backend.userservice.dto;
 
+import lombok.Data;
 
-public class UserLoginRequest {
+@Data
+public class LoginDto {
     private String email;
     private String password;
-}
+} 

@@ -9,37 +9,26 @@ import lombok.Setter;
 @Getter
 @Setter
 @Entity
+@Inheritance(strategy = InheritanceType.JOINED)
 @Table(name = "users")
-public class User {
+public abstract class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private Long id;
 
     @Column(unique = true, nullable = false)
     private String email;
+
     @Column(nullable = false)
     private String password;
 
     @Column(nullable = false)
     private String firstName;
+
     @Column(nullable = false)
     private String lastName;
 
+    @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Role role;
-
-    // inheritence mapping
-    @JoinColumn(nullable = true)
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
-    private ClientProfile clientProfile;
-
-    @JoinColumn(nullable = true)
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
-    private TrainerProfile trainerProfile;
-
-    @JoinColumn(nullable = true)
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
-    private AdminProfile adminProfile;
-
-
 }

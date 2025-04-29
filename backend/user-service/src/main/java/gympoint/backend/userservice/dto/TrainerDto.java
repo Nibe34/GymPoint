@@ -1,8 +1,8 @@
 package gympoint.backend.userservice.dto;
 
 
-public class TrainerProfileDto {
+public class TrainerDto extends UserDto {
     private String bio;
     private String specialization;
-    private int rating;
+    private float rating;
 }

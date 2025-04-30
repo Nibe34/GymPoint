@@ -3,67 +3,60 @@ package gympoint.backend.userservice.service.impl;
 import gympoint.backend.userservice.dto.ClientCreateDto;
 import gympoint.backend.userservice.dto.ClientDto;
 import gympoint.backend.userservice.entity.Client;
-import gympoint.backend.userservice.mapper.UserMapper;
+import gympoint.backend.userservice.mapper.ClientMapper;
 import gympoint.backend.userservice.repository.ClientRepository;
+import gympoint.backend.userservice.service.AbstractUserService;
 import gympoint.backend.userservice.service.ClientService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @Transactional
-public class ClientServiceImpl implements ClientService {
-
-    private final ClientRepository clientRepository;
-    private final UserMapper userMapper;
+public class ClientServiceImpl extends AbstractUserService<Client, ClientDto, ClientCreateDto, ClientRepository> implements ClientService {
 
     @Autowired
-    public ClientServiceImpl(ClientRepository clientRepository, UserMapper userMapper) {
-        this.clientRepository = clientRepository;
-        this.userMapper = userMapper;
+    public ClientServiceImpl(ClientRepository clientRepository, ClientMapper clientMapper) {
+        super(clientRepository, clientMapper);
     }
 
     @Override
     public ClientDto register(ClientCreateDto dto) {
-        Client client = userMapper.toClient(dto);
-        Client savedClient = clientRepository.save(client);
-        return userMapper.toClientDto(savedClient);
+        return createUser(dto);
     }
 
     @Override
     public ClientDto getById(Long id) {
-        Client client = clientRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Client not found with id: " + id));
-        return userMapper.toClientDto(client);
+        return getUserById(id);
     }
 
     @Override
     public List<ClientDto> getAll() {
-        return clientRepository.findAll().stream()
-                .map(userMapper::toClientDto)
-                .collect(Collectors.toList());
+        return getAllUsers();
     }
 
     @Override
     public ClientDto update(Long id, ClientDto dto) {
-        Client existingClient = clientRepository.findById(id)
+        Client existingClient = repository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Client not found with id: " + id));
-        
-        Client updatedClient = userMapper.toClient(dto);
-        updatedClient.setId(existingClient.getId());
-        
-        Client savedClient = clientRepository.save(updatedClient);
-        return userMapper.toClientDto(savedClient);
+
+        ClientCreateDto createDto = new ClientCreateDto();
+        createDto.setEmail(dto.getEmail());
+        createDto.setPassword(existingClient.getPassword());
+        createDto.setFirstName(dto.getFirstName());
+        createDto.setLastName(dto.getLastName());
+        createDto.setRole(dto.getRole());
+        createDto.setAddress(dto.getAddress());
+        createDto.setDateOfBirth(dto.getDateOfBirth());
+        createDto.setPhoneNumber(dto.getPhoneNumber());
+        createDto.setEmergencyContact(dto.getEmergencyContact());
+        return updateUser(id, createDto);
     }
 
     @Override
     public void deleteById(Long id) {
-        if (!clientRepository.existsById(id)) {
-            throw new RuntimeException("Client not found with id: " + id);
-        }
-        clientRepository.deleteById(id);
+        deleteUser(id);
     }
 } 

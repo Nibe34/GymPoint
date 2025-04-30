@@ -1,9 +1,10 @@
 package gympoint.backend.userservice.dto;
 
-
 import gympoint.backend.common.enums.Role;
+import lombok.Data;
 
-public abstract class UserDto {
+@Data
+public class UserDto {
     private Long id;
     private String email;
     private String firstName;

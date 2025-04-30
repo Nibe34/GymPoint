@@ -1,5 +1,6 @@
 package gympoint.backend.userservice.service;
 
+import gympoint.backend.userservice.dto.RegisterDto;
 import gympoint.backend.userservice.dto.UserCreateDto;
 import gympoint.backend.userservice.dto.UserDto;
 import gympoint.backend.userservice.entity.User;
@@ -8,6 +9,7 @@ import java.util.List;
 
 public interface UserService {
     UserDto createUser(UserCreateDto userCreateDto);
+    UserDto createUserWithProfile(RegisterDto registerDto);
     UserDto getUserById(Long id);
     List<UserDto> getAllUsers();
     UserDto updateUser(Long id, UserCreateDto userCreateDto);

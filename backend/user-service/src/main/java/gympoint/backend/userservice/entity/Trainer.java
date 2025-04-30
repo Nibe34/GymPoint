@@ -1,12 +1,14 @@
 package gympoint.backend.userservice.entity;
 
+import jakarta.persistence.*;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
-
+@Data
+@EqualsAndHashCode(callSuper = true)
 @Entity
 @Table(name = "trainers")
+@DiscriminatorValue("TRAINER")
 public class Trainer extends User {
     @Column(nullable = false)
     private String bio;
@@ -15,5 +17,8 @@ public class Trainer extends User {
     private String specialization;
 
     @Column(nullable = false)
-    private float rating;
+    private String certification;
+
+    @Column(nullable = false)
+    private Double rating;
 }

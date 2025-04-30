@@ -3,67 +3,51 @@ package gympoint.backend.userservice.service.impl;
 import gympoint.backend.userservice.dto.TrainerCreateDto;
 import gympoint.backend.userservice.dto.TrainerDto;
 import gympoint.backend.userservice.entity.Trainer;
-import gympoint.backend.userservice.mapper.UserMapper;
+import gympoint.backend.userservice.mapper.TrainerMapper;
 import gympoint.backend.userservice.repository.TrainerRepository;
+import gympoint.backend.userservice.service.AbstractUserService;
 import gympoint.backend.userservice.service.TrainerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @Transactional
-public class TrainerServiceImpl implements TrainerService {
-
-    private final TrainerRepository trainerRepository;
-    private final UserMapper userMapper;
+public class TrainerServiceImpl extends AbstractUserService<Trainer, TrainerDto, TrainerCreateDto, TrainerRepository> implements TrainerService {
 
     @Autowired
-    public TrainerServiceImpl(TrainerRepository trainerRepository, UserMapper userMapper) {
-        this.trainerRepository = trainerRepository;
-        this.userMapper = userMapper;
+    public TrainerServiceImpl(TrainerRepository trainerRepository, TrainerMapper trainerMapper) {
+        super(trainerRepository, trainerMapper);
     }
 
     @Override
     public TrainerDto createTrainer(TrainerCreateDto trainerCreateDto) {
-        Trainer trainer = userMapper.toTrainer(trainerCreateDto);
-        Trainer savedTrainer = trainerRepository.save(trainer);
-        return userMapper.toTrainerDto(savedTrainer);
+        return createUser(trainerCreateDto);
     }
 
     @Override
     public TrainerDto getTrainerById(Long id) {
-        Trainer trainer = trainerRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Trainer not found with id: " + id));
-        return userMapper.toTrainerDto(trainer);
+        return getUserById(id);
     }
 
     @Override
     public List<TrainerDto> getAllTrainers() {
-        return trainerRepository.findAll().stream()
-                .map(userMapper::toTrainerDto)
-                .collect(Collectors.toList());
+        return getAllUsers();
     }
 
     @Override
     public TrainerDto updateTrainer(Long id, TrainerCreateDto trainerCreateDto) {
-        Trainer existingTrainer = trainerRepository.findById(id)
+        Trainer existingTrainer = repository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Trainer not found with id: " + id));
         
-        Trainer updatedTrainer = userMapper.toTrainer(trainerCreateDto);
-        updatedTrainer.setId(existingTrainer.getId());
-        
-        Trainer savedTrainer = trainerRepository.save(updatedTrainer);
-        return userMapper.toTrainerDto(savedTrainer);
+        trainerCreateDto.setPassword(existingTrainer.getPassword()); // Preserve existing password
+        return updateUser(id, trainerCreateDto);
     }
 
     @Override
     public void deleteTrainer(Long id) {
-        if (!trainerRepository.existsById(id)) {
-            throw new RuntimeException("Trainer not found with id: " + id);
-        }
-        trainerRepository.deleteById(id);
+        deleteUser(id);
     }
 } 

@@ -1,12 +1,17 @@
 package gympoint.backend.userservice.service.impl;
 
+import gympoint.backend.userservice.dto.RegisterDto;
 import gympoint.backend.userservice.dto.UserCreateDto;
 import gympoint.backend.userservice.dto.UserDto;
+import gympoint.backend.userservice.entity.Admin;
+import gympoint.backend.userservice.entity.Client;
+import gympoint.backend.userservice.entity.Trainer;
 import gympoint.backend.userservice.entity.User;
 import gympoint.backend.userservice.mapper.UserMapper;
 import gympoint.backend.userservice.repository.UserRepository;
 import gympoint.backend.userservice.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,11 +24,13 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final UserMapper userMapper;
+    private final PasswordEncoder passwordEncoder;
 
     @Autowired
-    public UserServiceImpl(UserRepository userRepository, UserMapper userMapper) {
+    public UserServiceImpl(UserRepository userRepository, UserMapper userMapper, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.userMapper = userMapper;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Override
@@ -77,5 +84,53 @@ public class UserServiceImpl implements UserService {
     @Override
     public boolean existsByEmail(String email) {
         return userRepository.findByEmail(email).isPresent();
+    }
+
+    @Override
+    public UserDto createUserWithProfile(RegisterDto registerDto) {
+        if (registerDto.getRole() == null) {
+            throw new IllegalArgumentException("Role is required");
+        }
+
+        User user;
+        switch (registerDto.getRole()) {
+            case CLIENT -> {
+                if (registerDto.getDateOfBirth() == null) {
+                    throw new IllegalArgumentException("Date of birth is required for client");
+                }
+                Client client = new Client();
+                setBaseUserFields(client, registerDto);
+                client.setDateOfBirth(registerDto.getDateOfBirth());
+                client.setPhoneNumber(registerDto.getPhoneNumber());
+                client.setAddress(registerDto.getAddress());
+                client.setEmergencyContact(registerDto.getEmergencyContact());
+                user = userRepository.save(client);
+            }
+            case TRAINER -> {
+                Trainer trainer = new Trainer();
+                setBaseUserFields(trainer, registerDto);
+                trainer.setBio(registerDto.getBio());
+                trainer.setSpecialization(registerDto.getSpecialization());
+                trainer.setCertification(registerDto.getCertification());
+                trainer.setRating(0.0); // Initial rating
+                user = userRepository.save(trainer);
+            }
+            case ADMIN -> {
+                Admin admin = new Admin();
+                setBaseUserFields(admin, registerDto);
+                user = userRepository.save(admin);
+            }
+            default -> throw new IllegalArgumentException("Invalid role: " + registerDto.getRole());
+        }
+
+        return userMapper.toUserDto(user);
+    }
+
+    private void setBaseUserFields(User user, RegisterDto registerDto) {
+        user.setEmail(registerDto.getEmail());
+        user.setPassword(passwordEncoder.encode(registerDto.getPassword()));
+        user.setFirstName(registerDto.getFirstName());
+        user.setLastName(registerDto.getLastName());
+        user.setRole(registerDto.getRole());
     }
 } 

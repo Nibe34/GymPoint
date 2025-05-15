@@ -8,6 +8,6 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode(callSuper = true)
 public class AdminRegisterDto extends UserCreateDto {
     public AdminRegisterDto() {
-        this.setRole(Role.ADMIN);
+        this.setRole(Role.ROLE_ADMIN);
     }
 } 

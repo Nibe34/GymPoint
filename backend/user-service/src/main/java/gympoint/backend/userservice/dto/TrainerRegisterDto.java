@@ -11,6 +11,6 @@ public class TrainerRegisterDto extends UserCreateDto {
     private String certification;
 
     public TrainerRegisterDto() {
-        this.setRole(Role.TRAINER);
+        this.setRole(Role.ROLE_TRAINER);
     }
 } 

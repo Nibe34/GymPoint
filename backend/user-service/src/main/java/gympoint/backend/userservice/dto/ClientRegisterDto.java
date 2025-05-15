@@ -12,6 +12,6 @@ public class ClientRegisterDto extends UserCreateDto {
     private String emergencyContact;
 
     public ClientRegisterDto() {
-        this.setRole(Role.CLIENT);
+        this.setRole(Role.ROLE_CLIENT);
     }
 } 

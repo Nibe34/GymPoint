@@ -2,8 +2,8 @@ package gympoint.backend.common.enums;
 
 
 public enum Role {
-    CLIENT,
-    TRAINER,
-    ADMIN,
-    SUPER_ADMIN
+    ROLE_CLIENT,
+    ROLE_TRAINER,
+    ROLE_ADMIN,
+    ROLE_SUPERADMIN
 }

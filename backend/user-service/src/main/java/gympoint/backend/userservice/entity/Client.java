@@ -10,7 +10,7 @@ import java.time.LocalDate;
 @EqualsAndHashCode(callSuper = true)
 @Entity
 @Table(name = "clients")
-@DiscriminatorValue("CLIENT")
+@DiscriminatorValue("ROLE_CLIENT")
 public class Client extends User {
     @Column(nullable = false)
     private LocalDate dateOfBirth;

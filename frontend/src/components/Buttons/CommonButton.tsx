@@ -3,10 +3,11 @@ import styles from "./CommonButton.module.css";
 
 interface CommonButtonProps {
   children: React.ReactNode;
+  onClick?: () => void;
 }
 
-const CommonButton = ({children}: CommonButtonProps) => {
-    return (<button className= {styles.button}>{children}</button>)
+const CommonButton = ({children, onClick}: CommonButtonProps) => {
+    return (<button className= {styles.button} onClick={onClick}>{children}</button>)
 }
 
 export default CommonButton;

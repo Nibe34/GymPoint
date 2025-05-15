@@ -4,6 +4,7 @@ import { useState } from 'react';
 import Navigation from "../Navigation/Navigation"
 
 import Modal from "../Modal/Modal"
+import LoginForm from '../Forms/LoginForm'
 import Button from "../Buttons/CommonButton";
 
 import styles from './Header.module.css'
@@ -18,7 +19,7 @@ const Header = () => {
         <Navigation/>
         <Button onClick={() => setIsModalOpen(true)}>Login</Button>
         </div>
-        <Modal active={isOpenModal} setActive={setIsModalOpen}></Modal>
+       <Modal active={isOpenModal} setActive={setIsModalOpen}><LoginForm></LoginForm></Modal>
     </header>)
 }
 

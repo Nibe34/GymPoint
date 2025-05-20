@@ -1,8 +1,28 @@
-import React from "react"
+
+import { Tabs } from "antd";
+import TrainerForm from "../components/Forms/TrainerForm";
+import ClientForm from "../components/Forms/ClientForm";
 
 const Registration = () => {
   return (
-       <h1>Its Registration Page</h1>
+       <>
+         <Tabs
+    defaultActiveKey="client"
+    centered
+    items={[
+      {
+        label: 'Client',
+        key: 'client',
+        children: <ClientForm />
+      },
+      {
+        label: 'Trainer',
+        key: 'trainer',
+        children: <TrainerForm />,
+      },
+    ]}
+  />
+       </>
   )
 };
 

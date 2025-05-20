@@ -11,11 +11,11 @@ type requestUser = IAdmin | ITrainer | IClient;
 
 export default class AuthService {
     static async login(email:string, password:string): Promise<AxiosResponse<AuthResponse>> {
-        return $api.post<AuthResponse>('auth/login', {email, password})
+        return $api.post<AuthResponse>('auth/login', {email , password})
     }
 
      static async registration(user: requestUser): Promise<AxiosResponse<AuthResponse>> {
-        return $api.post<AuthResponse>('auth/register', {...user})
+        return $api.post<AuthResponse>('auth/register', user)
     }
 
      static async logout(): Promise<void> {

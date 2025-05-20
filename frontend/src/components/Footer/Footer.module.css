@@ -1,0 +1,54 @@
+footer {
+    background-color: #1D302E;
+    padding: 20px 0;
+    margin-top: 20px;
+}
+
+.__container {
+    display: flex;
+    border-bottom: 1px solid white;
+    gap: 5px;
+    color: white;
+    flex-wrap: wrap;
+}
+
+.logo {
+    flex: 1 1 20%;
+    border-right: 1px solid white;
+    padding-top: 20px;
+    min-width: 270px;
+}
+
+.block {
+    flex: 1 1 20%;
+    padding: 20px;
+     min-width: 200px;
+}
+
+footer h3 { 
+    font-size: 24px;
+    font-weight: 700;
+}
+
+footer li, p {
+    margin-top: 7px;
+}
+
+footer a {
+    color: white;
+}
+
+.bottom {
+    margin-top: 10px;
+    text-align: center;
+    color: white;
+}
+
+@media (max-width: 950px) {
+    .__container {
+        flex-direction: column;
+    }
+    .logo {
+        padding-left: 20px;
+    }
+}

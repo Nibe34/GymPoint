@@ -9,6 +9,7 @@ import Services from '../pages/Services';
 import About from '../pages/About';
 import Coaches from '../pages/Coaches';
 import Registration from '../pages/Registration';
+import  Footer  from '../components/Footer/Footer';
 
 function App() {
 
@@ -22,10 +23,10 @@ function App() {
     <Route path={'/services'} element={<Services/>}/>
     <Route path={'/about-us'} element={<About/>}/>
     <Route path={'/coaches'} element={<Coaches/>}/>
-        <Route path={'/registration'} element={<Registration/>}/>
+    <Route path={'/registration'} element={<Registration/>}/>
     </Routes>
     </main>
-
+    <Footer/>
     </BrowserRouter>
   )
 }

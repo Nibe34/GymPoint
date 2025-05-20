@@ -1,4 +1,4 @@
-import type IUser from '../Models/IUser'
+import type IUser from '../Models/users/IUser'
 import type { AxiosResponse } from "axios";
 import $api from "../http";
 

@@ -19,7 +19,7 @@ const Header = () => {
         <Navigation/>
         <Button onClick={() => setIsModalOpen(true)}>Login</Button>
         </div>
-       <Modal active={isOpenModal} setActive={setIsModalOpen}><LoginForm></LoginForm></Modal>
+       <Modal active={isOpenModal} setActive={setIsModalOpen}><LoginForm setActive={setIsModalOpen}></LoginForm></Modal>
     </header>)
 }
 

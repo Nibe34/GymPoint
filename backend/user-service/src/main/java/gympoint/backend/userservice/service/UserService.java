@@ -12,7 +12,7 @@ import java.util.List;
 
 public interface UserService {
     UserDto createUser(UserCreateDto userCreateDto);
-    UserDto createUserWithProfile(RegisterDto registerDto);
+    AuthResponseDto createUserWithProfile(RegisterDto registerDto);
     UserDto getUserById(Long id);
     List<UserDto> getAllUsers();
     UserDto updateUser(Long id, UserCreateDto userCreateDto);

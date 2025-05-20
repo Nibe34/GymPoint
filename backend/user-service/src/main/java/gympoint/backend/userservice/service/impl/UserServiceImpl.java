@@ -105,7 +105,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserDto createUserWithProfile(RegisterDto registerDto) {
+    public AuthResponseDto createUserWithProfile(RegisterDto registerDto) {
         if (registerDto.getRole() == null) {
             throw new IllegalArgumentException("Role is required");
         }
@@ -141,7 +141,23 @@ public class UserServiceImpl implements UserService {
             default -> throw new IllegalArgumentException("Invalid role: " + registerDto.getRole());
         }
 
-        return userMapper.toUserDto(user);
+        // Create authentication for the newly registered user
+        org.springframework.security.core.userdetails.User userDetails = 
+            new org.springframework.security.core.userdetails.User(
+                user.getEmail(),
+                user.getPassword(),
+                List.of(new org.springframework.security.core.authority.SimpleGrantedAuthority(user.getRole().name()))
+            );
+        
+        // Create authentication token
+        UsernamePasswordAuthenticationToken authentication =
+                new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+        
+        // Generate tokens
+        String accessToken = jwtTokenProvider.generateToken(authentication);
+        RefreshToken refreshToken = refreshTokenService.createRefreshToken(user);
+        
+        return new AuthResponseDto(accessToken, refreshToken.getToken(), user.getId());
     }
 
     private void setBaseUserFields(User user, RegisterDto registerDto) {
@@ -178,7 +194,7 @@ public class UserServiceImpl implements UserService {
             RefreshToken refreshToken = refreshTokenService.createRefreshToken(user);
             logger.debug("Generated refresh token for user: {}", loginDto.getEmail());
             
-            return new AuthResponseDto(accessToken, refreshToken.getToken(), "Bearer");
+            return new AuthResponseDto(accessToken, refreshToken.getToken(), user.getId());
         } catch (AuthenticationException e) {
             logger.error("Authentication failed for user: {}", loginDto.getEmail(), e);
             throw e;
@@ -230,7 +246,7 @@ public class UserServiceImpl implements UserService {
             String accessToken = jwtTokenProvider.generateToken(authentication);
             
             logger.debug("Successfully refreshed token for user: {}", user.getEmail());
-            return new AuthResponseDto(accessToken, requestRefreshToken, "Bearer");
+            return new AuthResponseDto(accessToken, requestRefreshToken, user.getId());
         } catch (IllegalArgumentException e) {
             logger.error("Invalid refresh token: {}", e.getMessage());
             throw e;

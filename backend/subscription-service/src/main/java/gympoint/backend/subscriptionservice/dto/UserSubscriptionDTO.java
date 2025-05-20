@@ -11,4 +11,5 @@ public class UserSubscriptionDTO {
     private LocalDateTime startDate;
     private LocalDateTime endDate;
     private Boolean isActive;
+    private Integer remainingVisits;
 } 

@@ -111,9 +111,9 @@ public class AuthController {
         }
 
         try {
-            userService.createUserWithProfile(registerDto);
+            AuthResponseDto response = userService.createUserWithProfile(registerDto);
             logger.debug("User registered successfully: {}", registerDto.getEmail());
-            return ResponseEntity.ok("User registered successfully");
+            return ResponseEntity.ok(response);
         } catch (IllegalArgumentException e) {
             logger.error("Registration failed for user: {}", registerDto.getEmail(), e);
             return ResponseEntity.badRequest().body(e.getMessage());

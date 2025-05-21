@@ -20,7 +20,7 @@ const ClientForm: React.FC = () => {
   };
 
   return (
-    <Form
+    <Form className='__container'
       layout="vertical"
       form={form}
       onFinish={handleSubmit}

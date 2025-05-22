@@ -6,6 +6,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
+import gympoint.backend.userservice.entity.User;
+import gympoint.backend.userservice.repository.UserRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.crypto.SecretKey;
 import java.util.Date;
@@ -16,13 +19,17 @@ public class JwtTokenProvider {
 
     private final SecretKey jwtSecret;
     private final int jwtExpirationInMs;
+    private final UserRepository userRepository;
 
+    @Autowired
     public JwtTokenProvider(
             @Value("${app.jwtSecret}") String jwtSecretString,
-            @Value("${app.jwtExpirationInMs}") int jwtExpirationInMs) {
+            @Value("${app.jwtExpirationInMs}") int jwtExpirationInMs,
+            UserRepository userRepository) {
         // Convert the string secret to a secure key
         this.jwtSecret = Keys.hmacShaKeyFor(jwtSecretString.getBytes());
         this.jwtExpirationInMs = jwtExpirationInMs;
+        this.userRepository = userRepository;
     }
 
     public String generateToken(Authentication authentication) {
@@ -34,9 +41,14 @@ public class JwtTokenProvider {
                 .map(Object::toString)
                 .orElse("USER");
 
+        // Get user from database to get the ID
+        User user = userRepository.findByEmail(userDetails.getUsername())
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
         return Jwts.builder()
                 .setSubject(userDetails.getUsername())
                 .claim("role", role)
+                .claim("userId", user.getId())
                 .setIssuedAt(new Date())
                 .setExpiration(expiryDate)
                 .signWith(jwtSecret)
@@ -51,6 +63,16 @@ public class JwtTokenProvider {
                 .getBody();
 
         return claims.getSubject();
+    }
+
+    public Long getUserIdFromJWT(String token) {
+        Claims claims = Jwts.parserBuilder()
+                .setSigningKey(jwtSecret)
+                .build()
+                .parseClaimsJws(token)
+                .getBody();
+
+        return claims.get("userId", Long.class);
     }
 
     @SuppressWarnings("unchecked")

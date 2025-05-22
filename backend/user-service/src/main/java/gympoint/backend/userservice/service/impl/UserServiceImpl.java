@@ -24,6 +24,7 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -146,7 +147,7 @@ public class UserServiceImpl implements UserService {
             new org.springframework.security.core.userdetails.User(
                 user.getEmail(),
                 user.getPassword(),
-                List.of(new org.springframework.security.core.authority.SimpleGrantedAuthority(user.getRole().name()))
+                Arrays.asList(new org.springframework.security.core.authority.SimpleGrantedAuthority(user.getRole().name()))
             );
         
         // Create authentication token
@@ -236,7 +237,7 @@ public class UserServiceImpl implements UserService {
                 new org.springframework.security.core.userdetails.User(
                     user.getEmail(),
                     user.getPassword(),
-                    List.of(new org.springframework.security.core.authority.SimpleGrantedAuthority(user.getRole().name()))
+                    Arrays.asList(new org.springframework.security.core.authority.SimpleGrantedAuthority(user.getRole().name()))
                 );
             
             // Create authentication with UserDetails
@@ -254,5 +255,16 @@ public class UserServiceImpl implements UserService {
             logger.error("Unexpected error during token refresh", e);
             throw new RuntimeException("Failed to refresh token", e);
         }
+    }
+
+    @Override
+    public UserDto getCurrentUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !authentication.isAuthenticated()) {
+            throw new RuntimeException("No authenticated user found");
+        }
+        
+        String email = authentication.getName();
+        return getUserByEmail(email);
     }
 } 

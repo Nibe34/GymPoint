@@ -21,4 +21,5 @@ public interface UserService {
     boolean existsByEmail(String email);
     AuthResponseDto authenticateUser(LoginDto loginDto);
     AuthResponseDto refreshToken(RefreshTokenRequestDto request);
+    UserDto getCurrentUser();
 } 

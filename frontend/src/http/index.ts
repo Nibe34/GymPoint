@@ -3,7 +3,7 @@ import type { InternalAxiosRequestConfig  } from 'axios';
 import axios from 'axios';
 
 
-export const BASE_URL = 'http://localhost:5000/'
+export const BASE_URL = 'http://localhost:8081/api/'
 
 const $api = axios.create({
     withCredentials: true,

@@ -7,11 +7,9 @@ interface HeroProps {
   title: React.ReactNode;
   description: React.ReactNode;
   to?: string;
-  imageSrc: string; 
-  imageAlt: string; 
 }
 
-const Hero = ({ title, description, to = '/coaches', imageSrc, imageAlt }: HeroProps) => {
+const Hero = ({ title, description, to = '/coaches' }: HeroProps) => {
   const navigate = useNavigate();
 
   const handleClick = () => {
@@ -27,9 +25,6 @@ const Hero = ({ title, description, to = '/coaches', imageSrc, imageAlt }: HeroP
         <div className={styles.buttonContainer}>
           <CommonButton onClick={handleClick}>Get Started</CommonButton>
         </div>
-      </div>
-      <div className={styles.image}>
-        <img src={imageSrc} alt={imageAlt} />
       </div>
       </div>
     </section>

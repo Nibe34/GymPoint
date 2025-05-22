@@ -22,7 +22,7 @@ body, html {
 /* Links */
 
 a {
-	color: #F3F4F6;
+	color: #292929;
 }
 
 a, a:link, a:visited  {
@@ -30,7 +30,7 @@ a, a:link, a:visited  {
 }
 
 a:hover  {
-    text-decoration: none;
+    color: black;
 }
 
 /* Common */
@@ -108,8 +108,17 @@ input[type='file'] {
   margin: 10px 20px 0px;
 }
 
+#root {
+    height: 100%; 
+    display: flex;
+    flex-direction: column;
+}
+
+main { 
+    flex: 1 0 auto;
+}
 
 a.active {
-    color: #ffffff;
 	text-decoration: underline;
+    color: black;
 }

@@ -24,6 +24,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -222,19 +224,20 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public AuthResponseDto refreshToken(RefreshTokenRequestDto request) {
+    public AuthResponseDto refreshToken(RefreshTokenRequestDto request, HttpServletRequest httpRequest) {
         logger.debug("Attempting to refresh token");
-        String requestRefreshToken = request.getRefreshToken();
         
-        if (requestRefreshToken == null || requestRefreshToken.trim().isEmpty()) {
-            logger.error("Refresh token is null or empty");
-            throw new IllegalArgumentException("Refresh token cannot be null or empty");
+        // Get refresh token from cookies
+        String refreshTokenValue = getRefreshTokenFromCookies(httpRequest);
+        if (refreshTokenValue == null) {
+            logger.error("No refresh token found in cookies");
+            throw new IllegalArgumentException("Refresh token not found in cookies");
         }
 
         try {
-            RefreshToken refreshToken = refreshTokenService.findByToken(requestRefreshToken)
+            RefreshToken refreshToken = refreshTokenService.findByToken(refreshTokenValue)
                     .orElseThrow(() -> {
-                        logger.error("Refresh token not found: {}", requestRefreshToken);
+                        logger.error("Refresh token not found: {}", refreshTokenValue);
                         return new IllegalArgumentException("Invalid refresh token");
                     });
 
@@ -242,7 +245,7 @@ public class UserServiceImpl implements UserService {
             User user = refreshToken.getUser();
             
             if (user == null) {
-                logger.error("User not found for refresh token: {}", requestRefreshToken);
+                logger.error("User not found for refresh token: {}", refreshTokenValue);
                 throw new IllegalArgumentException("Invalid refresh token");
             }
 
@@ -262,9 +265,12 @@ public class UserServiceImpl implements UserService {
             
             String accessToken = jwtTokenProvider.generateToken(authentication);
             
+            // Create new refresh token
+            RefreshToken newRefreshToken = refreshTokenService.createRefreshToken(user);
+            
             // Create cookies
             ResponseCookie accessTokenCookie = accessTokenCookieBuilder.value(accessToken).build();
-            ResponseCookie refreshTokenCookie = refreshTokenCookieBuilder.value(refreshToken.getToken()).build();
+            ResponseCookie refreshTokenCookie = refreshTokenCookieBuilder.value(newRefreshToken.getToken()).build();
             
             return new AuthResponseDto(accessTokenCookie.toString(), refreshTokenCookie.toString(), user.getId());
         } catch (IllegalArgumentException e) {
@@ -274,5 +280,17 @@ public class UserServiceImpl implements UserService {
             logger.error("Unexpected error during token refresh", e);
             throw new RuntimeException("Failed to refresh token", e);
         }
+    }
+
+    private String getRefreshTokenFromCookies(HttpServletRequest request) {
+        Cookie[] cookies = request.getCookies();
+        if (cookies != null) {
+            return Arrays.stream(cookies)
+                    .filter(cookie -> "refresh_token".equals(cookie.getName()))
+                    .findFirst()
+                    .map(Cookie::getValue)
+                    .orElse(null);
+        }
+        return null;
     }
 } 

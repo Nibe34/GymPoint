@@ -10,9 +10,11 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -20,14 +22,12 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/auth")
 @Tag(name = "Authentication", description = "Authentication endpoints")
+@CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true")
 public class AuthController {
 
     private static final Logger logger = LoggerFactory.getLogger(AuthController.class);
@@ -51,22 +51,25 @@ public class AuthController {
         @ApiResponse(responseCode = "200", description = "Successfully authenticated"),
         @ApiResponse(responseCode = "401", description = "Invalid credentials")
     })
-    public ResponseEntity<?> login(@RequestBody LoginDto loginDto) {
+    public ResponseEntity<AuthResponseDto> login(@RequestBody LoginDto loginDto) {
         logger.debug("Attempting login for user: {}", loginDto.getEmail());
         
         try {
             AuthResponseDto response = userService.authenticateUser(loginDto);
             logger.debug("Login successful for user: {}", loginDto.getEmail());
-            return ResponseEntity.ok(response);
+            return ResponseEntity.ok()
+                    .header(HttpHeaders.SET_COOKIE, response.getAccessTokenCookie())
+                    .header(HttpHeaders.SET_COOKIE, response.getRefreshTokenCookie())
+                    .body(response);
         } catch (BadCredentialsException e) {
             logger.error("Invalid credentials for user: {}", loginDto.getEmail());
-            return ResponseEntity.status(401).body("Invalid email or password");
+            return ResponseEntity.status(401).body(null);
         } catch (AuthenticationException e) {
             logger.error("Authentication failed for user: {}", loginDto.getEmail(), e);
-            return ResponseEntity.status(401).body("Authentication failed: " + e.getMessage());
+            return ResponseEntity.status(401).body(null);
         } catch (Exception e) {
             logger.error("Unexpected error during login for user: {}", loginDto.getEmail(), e);
-            return ResponseEntity.status(500).body("An unexpected error occurred");
+            return ResponseEntity.status(500).body(null);
         }
     }
 
@@ -76,18 +79,21 @@ public class AuthController {
         @ApiResponse(responseCode = "200", description = "Token refreshed successfully"),
         @ApiResponse(responseCode = "401", description = "Invalid or expired refresh token")
     })
-    public ResponseEntity<?> refreshToken(@RequestBody RefreshTokenRequestDto request) {
+    public ResponseEntity<AuthResponseDto> refreshToken(@RequestBody RefreshTokenRequestDto request, HttpServletRequest httpRequest) {
         logger.debug("Attempting to refresh token");
         try {
-            AuthResponseDto response = userService.refreshToken(request);
+            AuthResponseDto response = userService.refreshToken(request, httpRequest);
             logger.debug("Token refresh successful");
-            return ResponseEntity.ok(response);
+            return ResponseEntity.ok()
+                    .header(HttpHeaders.SET_COOKIE, response.getAccessTokenCookie())
+                    .header(HttpHeaders.SET_COOKIE, response.getRefreshTokenCookie())
+                    .body(response);
         } catch (IllegalArgumentException e) {
             logger.error("Invalid refresh token request: {}", e.getMessage());
-            return ResponseEntity.status(401).body(e.getMessage());
+            return ResponseEntity.status(401).body(null);
         } catch (Exception e) {
             logger.error("Token refresh failed", e);
-            return ResponseEntity.status(401).body("Invalid refresh token");
+            return ResponseEntity.status(401).body(null);
         }
     }
 
@@ -97,26 +103,29 @@ public class AuthController {
         @ApiResponse(responseCode = "200", description = "User registered successfully"),
         @ApiResponse(responseCode = "400", description = "Invalid input or email already taken")
     })
-    public ResponseEntity<?> registerUser(@RequestBody RegisterDto registerDto) {
+    public ResponseEntity<AuthResponseDto> registerUser(@RequestBody RegisterDto registerDto) {
         logger.debug("Attempting to register user: {}", registerDto.getEmail());
         
         if (userService.existsByEmail(registerDto.getEmail())) {
             logger.warn("Registration failed - email already taken: {}", registerDto.getEmail());
-            return ResponseEntity.badRequest().body("Email is already taken!");
+            return ResponseEntity.badRequest().body(null);
         }
 
         if (registerDto.getRole() == null) {
             logger.warn("Registration failed - role is required for user: {}", registerDto.getEmail());
-            return ResponseEntity.badRequest().body("Role is required!");
+            return ResponseEntity.badRequest().body(null);
         }
 
         try {
             AuthResponseDto response = userService.createUserWithProfile(registerDto);
             logger.debug("User registered successfully: {}", registerDto.getEmail());
-            return ResponseEntity.ok(response);
+            return ResponseEntity.ok()
+                    .header(HttpHeaders.SET_COOKIE, response.getAccessTokenCookie())
+                    .header(HttpHeaders.SET_COOKIE, response.getRefreshTokenCookie())
+                    .body(response);
         } catch (IllegalArgumentException e) {
             logger.error("Registration failed for user: {}", registerDto.getEmail(), e);
-            return ResponseEntity.badRequest().body(e.getMessage());
+            return ResponseEntity.badRequest().body(null);
         }
     }
 } 

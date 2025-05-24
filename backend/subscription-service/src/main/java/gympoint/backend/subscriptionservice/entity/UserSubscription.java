@@ -27,4 +27,7 @@ public class UserSubscription {
 
     @Column(name = "is_active", nullable = false)
     private Boolean isActive;
+
+    @Column(name = "remaining_visits", nullable = false)
+    private Integer remainingVisits;
 } 

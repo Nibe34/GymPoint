@@ -4,5 +4,5 @@ import lombok.Data;
 
 @Data
 public class RefreshTokenRequestDto {
-    private String refreshToken;
+    // No fields needed as the refresh token will be read from cookies
 } 

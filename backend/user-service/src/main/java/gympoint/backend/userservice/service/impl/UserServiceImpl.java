@@ -15,6 +15,7 @@ import gympoint.backend.userservice.service.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseCookie;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -24,6 +25,8 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -37,18 +40,24 @@ public class UserServiceImpl implements UserService {
     private final JwtTokenProvider jwtTokenProvider;
     private final RefreshTokenService refreshTokenService;
     private final AuthenticationManager authenticationManager;
+    private final ResponseCookie.ResponseCookieBuilder accessTokenCookieBuilder;
+    private final ResponseCookie.ResponseCookieBuilder refreshTokenCookieBuilder;
     private static final Logger logger = LoggerFactory.getLogger(UserServiceImpl.class);
 
     @Autowired
     public UserServiceImpl(UserRepository userRepository, UserMapper userMapper, PasswordEncoder passwordEncoder,
                            JwtTokenProvider jwtTokenProvider, RefreshTokenService refreshTokenService,
-                           AuthenticationManager authenticationManager) {
+                           AuthenticationManager authenticationManager,
+                           ResponseCookie.ResponseCookieBuilder accessTokenCookieBuilder,
+                           ResponseCookie.ResponseCookieBuilder refreshTokenCookieBuilder) {
         this.userRepository = userRepository;
         this.userMapper = userMapper;
         this.passwordEncoder = passwordEncoder;
         this.jwtTokenProvider = jwtTokenProvider;
         this.refreshTokenService = refreshTokenService;
         this.authenticationManager = authenticationManager;
+        this.accessTokenCookieBuilder = accessTokenCookieBuilder;
+        this.refreshTokenCookieBuilder = refreshTokenCookieBuilder;
     }
 
     @Override
@@ -146,7 +155,7 @@ public class UserServiceImpl implements UserService {
             new org.springframework.security.core.userdetails.User(
                 user.getEmail(),
                 user.getPassword(),
-                List.of(new org.springframework.security.core.authority.SimpleGrantedAuthority(user.getRole().name()))
+                Collections.singletonList(new org.springframework.security.core.authority.SimpleGrantedAuthority(user.getRole().name()))
             );
         
         // Create authentication token
@@ -157,7 +166,11 @@ public class UserServiceImpl implements UserService {
         String accessToken = jwtTokenProvider.generateToken(authentication);
         RefreshToken refreshToken = refreshTokenService.createRefreshToken(user);
         
-        return new AuthResponseDto(accessToken, refreshToken.getToken(), user.getId());
+        // Create cookies
+        ResponseCookie accessTokenCookie = accessTokenCookieBuilder.value(accessToken).build();
+        ResponseCookie refreshTokenCookie = refreshTokenCookieBuilder.value(refreshToken.getToken()).build();
+        
+        return new AuthResponseDto(accessTokenCookie.toString(), refreshTokenCookie.toString(), user.getId());
     }
 
     private void setBaseUserFields(User user, RegisterDto registerDto) {
@@ -194,7 +207,11 @@ public class UserServiceImpl implements UserService {
             RefreshToken refreshToken = refreshTokenService.createRefreshToken(user);
             logger.debug("Generated refresh token for user: {}", loginDto.getEmail());
             
-            return new AuthResponseDto(accessToken, refreshToken.getToken(), user.getId());
+            // Create cookies
+            ResponseCookie accessTokenCookie = accessTokenCookieBuilder.value(accessToken).build();
+            ResponseCookie refreshTokenCookie = refreshTokenCookieBuilder.value(refreshToken.getToken()).build();
+            
+            return new AuthResponseDto(accessTokenCookie.toString(), refreshTokenCookie.toString(), user.getId());
         } catch (AuthenticationException e) {
             logger.error("Authentication failed for user: {}", loginDto.getEmail(), e);
             throw e;
@@ -236,7 +253,7 @@ public class UserServiceImpl implements UserService {
                 new org.springframework.security.core.userdetails.User(
                     user.getEmail(),
                     user.getPassword(),
-                    List.of(new org.springframework.security.core.authority.SimpleGrantedAuthority(user.getRole().name()))
+                    Collections.singletonList(new org.springframework.security.core.authority.SimpleGrantedAuthority(user.getRole().name()))
                 );
             
             // Create authentication with UserDetails
@@ -245,8 +262,11 @@ public class UserServiceImpl implements UserService {
             
             String accessToken = jwtTokenProvider.generateToken(authentication);
             
-            logger.debug("Successfully refreshed token for user: {}", user.getEmail());
-            return new AuthResponseDto(accessToken, requestRefreshToken, user.getId());
+            // Create cookies
+            ResponseCookie accessTokenCookie = accessTokenCookieBuilder.value(accessToken).build();
+            ResponseCookie refreshTokenCookie = refreshTokenCookieBuilder.value(refreshToken.getToken()).build();
+            
+            return new AuthResponseDto(accessTokenCookie.toString(), refreshTokenCookie.toString(), user.getId());
         } catch (IllegalArgumentException e) {
             logger.error("Invalid refresh token: {}", e.getMessage());
             throw e;

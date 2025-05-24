@@ -282,6 +282,7 @@ public class UserServiceImpl implements UserService {
         }
     }
 
+
     private String getRefreshTokenFromCookies(HttpServletRequest request) {
         Cookie[] cookies = request.getCookies();
         if (cookies != null) {

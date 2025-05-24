@@ -80,4 +80,17 @@ public class UserController {
         UserDto user = userService.getUserByEmail(email);
         return ResponseEntity.ok(user);
     }
+
+    @GetMapping("/me")
+    @Operation(summary = "Get current user profile", description = "Retrieve the profile of the currently authenticated user")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "User profile retrieved successfully"),
+        @ApiResponse(responseCode = "401", description = "User not authenticated"),
+        @ApiResponse(responseCode = "403", description = "Access denied")
+    })
+    @SecurityRequirement(name = "bearerAuth")
+    public ResponseEntity<UserDto> getCurrentUser() {
+        UserDto user = userService.getCurrentUser();
+        return ResponseEntity.ok(user);
+    }
 } 

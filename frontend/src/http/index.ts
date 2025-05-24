@@ -11,10 +11,17 @@ const $api = axios.create({
     baseURL: BASE_URL
 })
 
-$api.interceptors.request.use( (config: InternalAxiosRequestConfig ) => {
-config.headers.Authorization = `Bearer ${localStorage.getItem('token')}`
-return config;
-})
+$api.interceptors.request.use((config: InternalAxiosRequestConfig) => {
+  // Не додаємо токен до запиту /auth/refresh
+  if (!config.url?.includes('/auth/refresh')) {
+    const token = localStorage.getItem('token');
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+  }
+  return config;
+});
+
 
 
 $api.interceptors.response.use(
@@ -28,7 +35,7 @@ $api.interceptors.response.use(
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
       try {
-        const response = await axios.get<AuthResponse>('/auth/refresh', {
+        const response = await $api.get<AuthResponse>('/auth/refresh', {
           withCredentials: true
         });
 

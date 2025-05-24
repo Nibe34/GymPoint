@@ -7,6 +7,7 @@ import UserService from "../services/UserService";
  import type { UserType } from "../Models/users/UserType";
 import axios from "axios";
 import type { AuthResponse } from "../Models/responce/AutResponse";
+import $api from "../http";
 
 export default class Store {
     user = {} as UserType;
@@ -59,25 +60,28 @@ export default class Store {
     }
 
         // store.ts
-    async checkAuth() {
-        if(localStorage.getItem('token')) {
-             this.setAuth(true);
-             try {  
-                 const response = await axios.get<AuthResponse>(
-                         '/auth/refresh',
-                         { withCredentials: true }
-                       );
-               
-                       localStorage.setItem("token", response.data.accessToken);
-             } catch (error) {
-                        this.setAuth(false);
-                         this.setUser({} as UserType);
-             }
-        } else { 
-                this.setAuth(false);
-                 this.setUser({} as UserType);
-        }
-      } 
+async checkAuth() {
+  if (localStorage.getItem('token')) {
+    try {
+      const response = await $api.get<AuthResponse>('/auth/refresh', {
+        withCredentials: true,
+      });
+      localStorage.setItem("token", response.data.accessToken);
+
+      this.setAuth(true);
+      const userResponse = await UserService.fetchCurrentUser();
+      this.setUser(userResponse.data);
+
+    } catch (error) {
+      this.setAuth(false);
+      this.setUser({} as UserType);
+    }
+  } else {
+    this.setAuth(false);
+    this.setUser({} as UserType);
+  }
+}
+
 
 
       logout() { 

@@ -1,6 +1,6 @@
-import Hero from '../components/HeroBlock/Hero'
-import About from '../components/About/AboutBlock';
-import Advantage from '../components/Advantage/Advantage';
+import Hero from './component/HeroBlock/Hero'
+import About from './component/About/AboutBlock';
+import Advantage from './component/Advantage/Advantage';
 
 const Home = () => {
     return (<>

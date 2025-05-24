@@ -24,6 +24,7 @@ public class UserSubscriptionMapper {
         dto.setStartDate(entity.getStartDate());
         dto.setEndDate(entity.getEndDate());
         dto.setIsActive(entity.getIsActive());
+        dto.setRemainingVisits(entity.getRemainingVisits());
         return dto;
     }
 } 

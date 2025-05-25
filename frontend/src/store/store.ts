@@ -1,15 +1,15 @@
 import { makeAutoObservable } from "mobx";
-import type IUser from "../Models/users/IUser";
 import AuthService from "../services/AuthService";
 
-import type IAdmin from "../Models/users/IAdmin";
-import type ITrainer from "../Models/users/ITrainer";
-import type IClient from "../Models/users/IClient";
+import UserService from "../services/UserService";
 
- type requestUser = IAdmin | ITrainer | IClient;
+
+ import type { UserType } from "../Models/users/UserType";
+import axios from "axios";
+import type { AuthResponse } from "../Models/responce/AutResponse";
 
 export default class Store {
-    user = {} as IUser;
+    user = {} as UserType;
     isAuth = false;
 
     constructor() { 
@@ -20,7 +20,7 @@ export default class Store {
         this.isAuth = bool;
     }
 
-    setUser(user:IUser) {
+    setUser(user:UserType) {
         this.user = user;
     }
 
@@ -31,36 +31,58 @@ export default class Store {
             console.log(response.data);
             
             localStorage.setItem('token', response.data.accessToken);
+            console.log(response.data.refreshToken);
+            
             this.setAuth(true);
-            // this.setUser()
+             const userResponse = await UserService.fetchCurrentUser();
+        this.setUser(userResponse.data);
+        console.log( userResponse.data);
+        
         } catch (error) {
             console.log("error at login" + error);
             
         }
     }
 
-     async registration(userData: requestUser) { 
+     async registration(userData: UserType) { 
         try {
             const response = await AuthService.registration(userData);
              console.log(response.data);
             localStorage.setItem('token', response.data.accessToken);
             this.setAuth(true);
-            // this.setUser()
+            const userResponse = await UserService.fetchCurrentUser();
+        this.setUser(userResponse.data);
         } catch (error) {
             console.log("error at reg" + error);
             
         }
     }
 
-     async logout() { 
-        try {
-             await AuthService.logout();
+        // store.ts
+    async checkAuth() {
+        if(localStorage.getItem('token')) {
+             this.setAuth(true);
+             try {  
+                 const response = await axios.get<AuthResponse>(
+                         '/auth/refresh',
+                         { withCredentials: true }
+                       );
+               
+                       localStorage.setItem("token", response.data.accessToken);
+             } catch (error) {
+                        this.setAuth(false);
+                         this.setUser({} as UserType);
+             }
+        } else { 
+                this.setAuth(false);
+                 this.setUser({} as UserType);
+        }
+      } 
+
+
+      logout() { 
             localStorage.removeItem('token');
             this.setAuth(false);
-            // this.setUser()
-        } catch (error) {
-            console.log("error at login" + error);
-            
-        }
+             this.setUser({} as UserType)
     }
 }

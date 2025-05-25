@@ -18,7 +18,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.List;
+import java.util.Arrays;
 
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
@@ -51,10 +51,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 String role = tokenProvider.getRoleFromJWT(jwt);
                 logger.debug("Valid JWT token for user: {} with role: {}", username, role);
 
-                List<SimpleGrantedAuthority> authorities = List.of(new SimpleGrantedAuthority(role));
-
                 UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
-                        username, null, authorities);
+                        username, null, Arrays.asList(new SimpleGrantedAuthority(role)));
                 authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 
                 SecurityContextHolder.getContext().setAuthentication(authentication);
@@ -72,7 +70,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
         String path = request.getServletPath();
-        boolean shouldNotFilter = path.startsWith("/api/auth");
+        boolean shouldNotFilter = path.startsWith("/api/auth") || 
+                                path.startsWith("/v3/api-docs") || 
+                                path.startsWith("/swagger-ui");
         logger.debug("Checking if should filter path: {} - result: {}", path, shouldNotFilter);
         return shouldNotFilter;
     }

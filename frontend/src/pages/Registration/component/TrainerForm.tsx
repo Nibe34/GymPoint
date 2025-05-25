@@ -1,20 +1,20 @@
 import React, { useContext } from 'react';
 import { Form, Input, Button } from 'antd';
-import type ITrainer from '../../Models/users/ITrainer';
-import { Context } from '../../main';
-import Roles from '../../Models/users/Roles';
+import type ITrainer from '../../../Models/users/ITrainer';
+import { Context } from '../../../main';
+import Roles from '../../../Models/users/Roles';
 
 const TrainerForm: React.FC = () => {
   const [form] = Form.useForm<ITrainer & { password: string; confirmPassword: string }>();
 
-    const {store} = useContext(Context);
+  const { store } = useContext(Context);
 
-  const handleSubmit =  (values: any) => {
-      const { confirmPassword, ...rest } = values;
-      console.log('Submitted trainer data without confirmPassword:', rest);
-       store.registration(rest);
-     
-      
+  const handleSubmit = (values: any) => {
+    const { confirmPassword, ...rest } = values;
+    console.log('Submitted trainer data without confirmPassword:', rest);
+    store.registration(rest);
+
+
   };
 
   return (

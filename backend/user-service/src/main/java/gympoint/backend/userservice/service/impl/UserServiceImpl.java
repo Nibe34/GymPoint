@@ -15,6 +15,7 @@ import gympoint.backend.userservice.service.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseCookie;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -23,7 +24,11 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -37,18 +42,24 @@ public class UserServiceImpl implements UserService {
     private final JwtTokenProvider jwtTokenProvider;
     private final RefreshTokenService refreshTokenService;
     private final AuthenticationManager authenticationManager;
+    private final ResponseCookie.ResponseCookieBuilder accessTokenCookieBuilder;
+    private final ResponseCookie.ResponseCookieBuilder refreshTokenCookieBuilder;
     private static final Logger logger = LoggerFactory.getLogger(UserServiceImpl.class);
 
     @Autowired
     public UserServiceImpl(UserRepository userRepository, UserMapper userMapper, PasswordEncoder passwordEncoder,
                            JwtTokenProvider jwtTokenProvider, RefreshTokenService refreshTokenService,
-                           AuthenticationManager authenticationManager) {
+                           AuthenticationManager authenticationManager,
+                           ResponseCookie.ResponseCookieBuilder accessTokenCookieBuilder,
+                           ResponseCookie.ResponseCookieBuilder refreshTokenCookieBuilder) {
         this.userRepository = userRepository;
         this.userMapper = userMapper;
         this.passwordEncoder = passwordEncoder;
         this.jwtTokenProvider = jwtTokenProvider;
         this.refreshTokenService = refreshTokenService;
         this.authenticationManager = authenticationManager;
+        this.accessTokenCookieBuilder = accessTokenCookieBuilder;
+        this.refreshTokenCookieBuilder = refreshTokenCookieBuilder;
     }
 
     @Override
@@ -146,7 +157,7 @@ public class UserServiceImpl implements UserService {
             new org.springframework.security.core.userdetails.User(
                 user.getEmail(),
                 user.getPassword(),
-                List.of(new org.springframework.security.core.authority.SimpleGrantedAuthority(user.getRole().name()))
+                Collections.singletonList(new org.springframework.security.core.authority.SimpleGrantedAuthority(user.getRole().name()))
             );
         
         // Create authentication token
@@ -157,7 +168,11 @@ public class UserServiceImpl implements UserService {
         String accessToken = jwtTokenProvider.generateToken(authentication);
         RefreshToken refreshToken = refreshTokenService.createRefreshToken(user);
         
-        return new AuthResponseDto(accessToken, refreshToken.getToken(), user.getId());
+        // Create cookies
+        ResponseCookie accessTokenCookie = accessTokenCookieBuilder.value(accessToken).build();
+        ResponseCookie refreshTokenCookie = refreshTokenCookieBuilder.value(refreshToken.getToken()).build();
+        
+        return new AuthResponseDto(accessTokenCookie.toString(), refreshTokenCookie.toString(), user.getId());
     }
 
     private void setBaseUserFields(User user, RegisterDto registerDto) {
@@ -194,7 +209,11 @@ public class UserServiceImpl implements UserService {
             RefreshToken refreshToken = refreshTokenService.createRefreshToken(user);
             logger.debug("Generated refresh token for user: {}", loginDto.getEmail());
             
-            return new AuthResponseDto(accessToken, refreshToken.getToken(), user.getId());
+            // Create cookies
+            ResponseCookie accessTokenCookie = accessTokenCookieBuilder.value(accessToken).build();
+            ResponseCookie refreshTokenCookie = refreshTokenCookieBuilder.value(refreshToken.getToken()).build();
+            
+            return new AuthResponseDto(accessTokenCookie.toString(), refreshTokenCookie.toString(), user.getId());
         } catch (AuthenticationException e) {
             logger.error("Authentication failed for user: {}", loginDto.getEmail(), e);
             throw e;
@@ -205,19 +224,20 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public AuthResponseDto refreshToken(RefreshTokenRequestDto request) {
+    public AuthResponseDto refreshToken(RefreshTokenRequestDto request, HttpServletRequest httpRequest) {
         logger.debug("Attempting to refresh token");
-        String requestRefreshToken = request.getRefreshToken();
         
-        if (requestRefreshToken == null || requestRefreshToken.trim().isEmpty()) {
-            logger.error("Refresh token is null or empty");
-            throw new IllegalArgumentException("Refresh token cannot be null or empty");
+        // Get refresh token from cookies
+        String refreshTokenValue = getRefreshTokenFromCookies(httpRequest);
+        if (refreshTokenValue == null) {
+            logger.error("No refresh token found in cookies");
+            throw new IllegalArgumentException("Refresh token not found in cookies");
         }
 
         try {
-            RefreshToken refreshToken = refreshTokenService.findByToken(requestRefreshToken)
+            RefreshToken refreshToken = refreshTokenService.findByToken(refreshTokenValue)
                     .orElseThrow(() -> {
-                        logger.error("Refresh token not found: {}", requestRefreshToken);
+                        logger.error("Refresh token not found: {}", refreshTokenValue);
                         return new IllegalArgumentException("Invalid refresh token");
                     });
 
@@ -225,7 +245,7 @@ public class UserServiceImpl implements UserService {
             User user = refreshToken.getUser();
             
             if (user == null) {
-                logger.error("User not found for refresh token: {}", requestRefreshToken);
+                logger.error("User not found for refresh token: {}", refreshTokenValue);
                 throw new IllegalArgumentException("Invalid refresh token");
             }
 
@@ -236,7 +256,7 @@ public class UserServiceImpl implements UserService {
                 new org.springframework.security.core.userdetails.User(
                     user.getEmail(),
                     user.getPassword(),
-                    List.of(new org.springframework.security.core.authority.SimpleGrantedAuthority(user.getRole().name()))
+                    Collections.singletonList(new org.springframework.security.core.authority.SimpleGrantedAuthority(user.getRole().name()))
                 );
             
             // Create authentication with UserDetails
@@ -245,8 +265,14 @@ public class UserServiceImpl implements UserService {
             
             String accessToken = jwtTokenProvider.generateToken(authentication);
             
-            logger.debug("Successfully refreshed token for user: {}", user.getEmail());
-            return new AuthResponseDto(accessToken, requestRefreshToken, user.getId());
+            // Create new refresh token
+            RefreshToken newRefreshToken = refreshTokenService.createRefreshToken(user);
+            
+            // Create cookies
+            ResponseCookie accessTokenCookie = accessTokenCookieBuilder.value(accessToken).build();
+            ResponseCookie refreshTokenCookie = refreshTokenCookieBuilder.value(newRefreshToken.getToken()).build();
+            
+            return new AuthResponseDto(accessTokenCookie.toString(), refreshTokenCookie.toString(), user.getId());
         } catch (IllegalArgumentException e) {
             logger.error("Invalid refresh token: {}", e.getMessage());
             throw e;
@@ -254,5 +280,18 @@ public class UserServiceImpl implements UserService {
             logger.error("Unexpected error during token refresh", e);
             throw new RuntimeException("Failed to refresh token", e);
         }
+    }
+
+
+    private String getRefreshTokenFromCookies(HttpServletRequest request) {
+        Cookie[] cookies = request.getCookies();
+        if (cookies != null) {
+            return Arrays.stream(cookies)
+                    .filter(cookie -> "refresh_token".equals(cookie.getName()))
+                    .findFirst()
+                    .map(Cookie::getValue)
+                    .orElse(null);
+        }
+        return null;
     }
 } 

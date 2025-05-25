@@ -7,6 +7,7 @@ import gympoint.backend.userservice.dto.RefreshTokenRequestDto;
 import gympoint.backend.userservice.dto.UserCreateDto;
 import gympoint.backend.userservice.dto.UserDto;
 import gympoint.backend.userservice.entity.User;
+import jakarta.servlet.http.HttpServletRequest;
 
 import java.util.List;
 
@@ -20,5 +21,5 @@ public interface UserService {
     UserDto getUserByEmail(String email);
     boolean existsByEmail(String email);
     AuthResponseDto authenticateUser(LoginDto loginDto);
-    AuthResponseDto refreshToken(RefreshTokenRequestDto request);
+    AuthResponseDto refreshToken(RefreshTokenRequestDto request, HttpServletRequest httpRequest);
 } 

@@ -297,6 +297,16 @@ public class UserServiceImpl implements UserService {
         }
     }
 
+    @Override
+    public UserDto getCurrentUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !authentication.isAuthenticated()) {
+            throw new RuntimeException("No authenticated user found");
+        }
+        
+        String email = authentication.getName();
+        return getUserByEmail(email);
+
     private String getRefreshTokenFromCookies(HttpServletRequest request) {
         Cookie[] cookies = request.getCookies();
         if (cookies != null) {

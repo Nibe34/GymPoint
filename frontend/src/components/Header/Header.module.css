@@ -16,13 +16,16 @@
 
 .logo img {
   max-height: 40px;
+  flex: 0 1 35%;
 }
 
 /* Показуємо меню на десктопі */
 .desktopMenu {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 1rem;
+    flex: 0 1 65%;
 }
 
 /* Ховаємо бургер на десктопі */

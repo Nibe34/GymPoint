@@ -34,13 +34,16 @@ const Header = observer(() => {
                 </div>
 
                 <div className={styles.desktopMenu}>
+                    <Navigation />
+
                     {store.isAuth ? (
                         <Button onClick={() => store.logout()}>Logout</Button>
                     ) : (
                         <Button onClick={() => setIsModalOpen(true)}>Login</Button>
                     )}
-                    <Navigation />
                 </div>
+
+
 
                 <div className={styles.burgerMenu}>
                     <AntButton

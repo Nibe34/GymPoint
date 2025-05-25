@@ -10,6 +10,7 @@ import gympoint.backend.userservice.mapper.UserMapper;
 import gympoint.backend.userservice.repository.RefreshTokenRepository;
 import gympoint.backend.userservice.repository.UserRepository;
 import gympoint.backend.userservice.security.JwtTokenProvider;
+import gympoint.backend.userservice.service.CookieService;
 import gympoint.backend.userservice.service.RefreshTokenService;
 import gympoint.backend.userservice.service.UserService;
 import org.slf4j.Logger;
@@ -42,24 +43,20 @@ public class UserServiceImpl implements UserService {
     private final JwtTokenProvider jwtTokenProvider;
     private final RefreshTokenService refreshTokenService;
     private final AuthenticationManager authenticationManager;
-    private final ResponseCookie.ResponseCookieBuilder accessTokenCookieBuilder;
-    private final ResponseCookie.ResponseCookieBuilder refreshTokenCookieBuilder;
+    private final CookieService cookieService;
     private static final Logger logger = LoggerFactory.getLogger(UserServiceImpl.class);
 
     @Autowired
     public UserServiceImpl(UserRepository userRepository, UserMapper userMapper, PasswordEncoder passwordEncoder,
                            JwtTokenProvider jwtTokenProvider, RefreshTokenService refreshTokenService,
-                           AuthenticationManager authenticationManager,
-                           ResponseCookie.ResponseCookieBuilder accessTokenCookieBuilder,
-                           ResponseCookie.ResponseCookieBuilder refreshTokenCookieBuilder) {
+                           AuthenticationManager authenticationManager, CookieService cookieService) {
         this.userRepository = userRepository;
         this.userMapper = userMapper;
         this.passwordEncoder = passwordEncoder;
         this.jwtTokenProvider = jwtTokenProvider;
         this.refreshTokenService = refreshTokenService;
         this.authenticationManager = authenticationManager;
-        this.accessTokenCookieBuilder = accessTokenCookieBuilder;
-        this.refreshTokenCookieBuilder = refreshTokenCookieBuilder;
+        this.cookieService = cookieService;
     }
 
     @Override
@@ -169,10 +166,16 @@ public class UserServiceImpl implements UserService {
         RefreshToken refreshToken = refreshTokenService.createRefreshToken(user);
         
         // Create cookies
-        ResponseCookie accessTokenCookie = accessTokenCookieBuilder.value(accessToken).build();
-        ResponseCookie refreshTokenCookie = refreshTokenCookieBuilder.value(refreshToken.getToken()).build();
-        
-        return new AuthResponseDto(accessTokenCookie.toString(), refreshTokenCookie.toString(), user.getId());
+        ResponseCookie accessTokenCookie = cookieService.createAccessTokenCookie(accessToken);
+        ResponseCookie refreshTokenCookie = cookieService.createRefreshTokenCookie(refreshToken.getToken());
+
+        return new AuthResponseDto(
+                accessTokenCookie.toString(),
+                refreshTokenCookie.toString(),
+                user.getId(),
+                accessToken,
+                refreshToken.getToken()
+        );
     }
 
     private void setBaseUserFields(User user, RegisterDto registerDto) {
@@ -210,10 +213,16 @@ public class UserServiceImpl implements UserService {
             logger.debug("Generated refresh token for user: {}", loginDto.getEmail());
             
             // Create cookies
-            ResponseCookie accessTokenCookie = accessTokenCookieBuilder.value(accessToken).build();
-            ResponseCookie refreshTokenCookie = refreshTokenCookieBuilder.value(refreshToken.getToken()).build();
-            
-            return new AuthResponseDto(accessTokenCookie.toString(), refreshTokenCookie.toString(), user.getId());
+            ResponseCookie accessTokenCookie = cookieService.createAccessTokenCookie(accessToken);
+            ResponseCookie refreshTokenCookie = cookieService.createRefreshTokenCookie(refreshToken.getToken());
+
+            return new AuthResponseDto(
+                    accessTokenCookie.toString(),
+                    refreshTokenCookie.toString(),
+                    user.getId(),
+                    accessToken,
+                    refreshToken.getToken()
+            );
         } catch (AuthenticationException e) {
             logger.error("Authentication failed for user: {}", loginDto.getEmail(), e);
             throw e;
@@ -269,10 +278,16 @@ public class UserServiceImpl implements UserService {
             RefreshToken newRefreshToken = refreshTokenService.createRefreshToken(user);
             
             // Create cookies
-            ResponseCookie accessTokenCookie = accessTokenCookieBuilder.value(accessToken).build();
-            ResponseCookie refreshTokenCookie = refreshTokenCookieBuilder.value(newRefreshToken.getToken()).build();
-            
-            return new AuthResponseDto(accessTokenCookie.toString(), refreshTokenCookie.toString(), user.getId());
+            ResponseCookie accessTokenCookie = cookieService.createAccessTokenCookie(accessToken);
+            ResponseCookie refreshTokenCookie = cookieService.createRefreshTokenCookie(newRefreshToken.getToken());
+
+            return new AuthResponseDto(
+                    accessTokenCookie.toString(),
+                    refreshTokenCookie.toString(),
+                    user.getId(),
+                    accessToken,
+                    refreshToken.getToken()
+            );
         } catch (IllegalArgumentException e) {
             logger.error("Invalid refresh token: {}", e.getMessage());
             throw e;
@@ -302,5 +317,19 @@ public class UserServiceImpl implements UserService {
                     .orElse(null);
         }
         return null;
+    }
+
+    @Override
+    public UserDto getCurrentUser() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !authentication.isAuthenticated()) {
+            throw new RuntimeException("No authenticated user found");
+        }
+
+        String email = authentication.getName();
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found with email: " + email));
+
+        return userMapper.toUserDto(user);
     }
 } 

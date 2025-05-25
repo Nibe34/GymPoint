@@ -2,10 +2,16 @@ import React, { useContext } from "react";
 import { Context } from '../main';
 import { AdminRoutes, authRoutes, publicRoutes } from "../routes";
 import { Route, Routes } from "react-router-dom";
-
-const AppRouter = () => {
+import { observer } from "mobx-react-lite";
+const AppRouter = observer(() => {
     const { store } = useContext(Context);
 
+    // Рендеримо loader, поки не ініціалізовано store (тобто поки не завершено checkAuth)
+    if (!store.isInitialized) {
+        return <div style={{ textAlign: 'center', marginTop: 40 }}>Завантаження...</div>;
+    }
+
+    // Далі твій звичайний рендер
     const isAuth = store.isAuth;
     const isAdmin = store.user.role === "ROLE_ADMIN";
 
@@ -24,6 +30,7 @@ const AppRouter = () => {
             ))}
         </Routes>
     );
-};
+});
+
 
 export default AppRouter;

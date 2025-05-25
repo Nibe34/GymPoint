@@ -11,4 +11,8 @@ public class AuthResponseDto {
     private String accessTokenCookie;
     private String refreshTokenCookie;
     private Long userId;
-} 
+    private String accessToken;  // Додаємо
+    private String refreshToken; // Додаємо
+
+    // Getters/Setters генерує Lombok через @Data
+}

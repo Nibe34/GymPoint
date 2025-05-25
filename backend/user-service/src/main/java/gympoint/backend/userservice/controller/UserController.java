@@ -18,6 +18,7 @@ import java.util.List;
 @RequestMapping("/api/users")
 @Tag(name = "Users", description = "User management endpoints")
 @SecurityRequirement(name = "bearerAuth")
+@CrossOrigin(origins = "http://localhost:5173", allowCredentials = "true")
 public class UserController {
 
     private final UserService userService;
@@ -30,8 +31,8 @@ public class UserController {
     @GetMapping("/{id}")
     @Operation(summary = "Get user by ID", description = "Retrieve a user by their ID")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "User found"),
-        @ApiResponse(responseCode = "404", description = "User not found")
+            @ApiResponse(responseCode = "200", description = "User found"),
+            @ApiResponse(responseCode = "404", description = "User not found")
     })
     public ResponseEntity<UserDto> getUserById(@PathVariable Long id) {
         UserDto user = userService.getUserById(id);
@@ -41,7 +42,7 @@ public class UserController {
     @GetMapping
     @Operation(summary = "Get all users", description = "Retrieve all users")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Users retrieved successfully")
+            @ApiResponse(responseCode = "200", description = "Users retrieved successfully")
     })
     public ResponseEntity<List<UserDto>> getAllUsers() {
         List<UserDto> users = userService.getAllUsers();
@@ -51,8 +52,8 @@ public class UserController {
     @PutMapping("/{id}")
     @Operation(summary = "Update user", description = "Update an existing user")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "User updated successfully"),
-        @ApiResponse(responseCode = "404", description = "User not found")
+            @ApiResponse(responseCode = "200", description = "User updated successfully"),
+            @ApiResponse(responseCode = "404", description = "User not found")
     })
     public ResponseEntity<UserDto> updateUser(@PathVariable Long id, @RequestBody UserCreateDto userCreateDto) {
         UserDto updatedUser = userService.updateUser(id, userCreateDto);
@@ -62,8 +63,8 @@ public class UserController {
     @DeleteMapping("/{id}")
     @Operation(summary = "Delete user", description = "Delete a user by their ID")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "204", description = "User deleted successfully"),
-        @ApiResponse(responseCode = "404", description = "User not found")
+            @ApiResponse(responseCode = "204", description = "User deleted successfully"),
+            @ApiResponse(responseCode = "404", description = "User not found")
     })
     public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
         userService.deleteUser(id);
@@ -73,8 +74,8 @@ public class UserController {
     @GetMapping("/email/{email}")
     @Operation(summary = "Get user by email", description = "Retrieve a user by their email")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "User found"),
-        @ApiResponse(responseCode = "404", description = "User not found")
+            @ApiResponse(responseCode = "200", description = "User found"),
+            @ApiResponse(responseCode = "404", description = "User not found")
     })
     public ResponseEntity<UserDto> getUserByEmail(@PathVariable String email) {
         UserDto user = userService.getUserByEmail(email);
@@ -84,13 +85,13 @@ public class UserController {
     @GetMapping("/me")
     @Operation(summary = "Get current user profile", description = "Retrieve the profile of the currently authenticated user")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "User profile retrieved successfully"),
-        @ApiResponse(responseCode = "401", description = "User not authenticated"),
-        @ApiResponse(responseCode = "403", description = "Access denied")
+            @ApiResponse(responseCode = "200", description = "User profile retrieved successfully"),
+            @ApiResponse(responseCode = "401", description = "User not authenticated"),
+            @ApiResponse(responseCode = "403", description = "Access denied")
     })
     @SecurityRequirement(name = "bearerAuth")
     public ResponseEntity<UserDto> getCurrentUser() {
         UserDto user = userService.getCurrentUser();
         return ResponseEntity.ok(user);
     }
-} 
+}

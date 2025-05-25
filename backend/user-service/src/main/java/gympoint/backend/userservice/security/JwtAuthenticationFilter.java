@@ -4,9 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
@@ -17,6 +15,8 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.Cookie;
+
 import java.io.IOException;
 import java.util.Arrays;
 
@@ -36,7 +36,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
         try {
             logger.debug("Processing request to: {}", request.getRequestURI());
-            
+
             if (shouldNotFilter(request)) {
                 logger.debug("Skipping JWT filter for: {}", request.getRequestURI());
                 filterChain.doFilter(request, response);
@@ -70,18 +70,40 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
         String path = request.getServletPath();
-        boolean shouldNotFilter = path.startsWith("/api/auth") || 
-                                path.startsWith("/v3/api-docs") || 
-                                path.startsWith("/swagger-ui");
+        boolean shouldNotFilter = path.startsWith("/api/auth") ||
+                path.startsWith("/v3/api-docs") ||
+                path.startsWith("/swagger-ui");
         logger.debug("Checking if should filter path: {} - result: {}", path, shouldNotFilter);
         return shouldNotFilter;
     }
 
     private String getJwtFromRequest(HttpServletRequest request) {
+        // Спочатку перевіряємо заголовок Authorization
         String bearerToken = request.getHeader("Authorization");
         if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {
+            logger.debug("JWT found in Authorization header");
             return bearerToken.substring(7);
+        }
+
+        // Якщо заголовок відсутній, перевіряємо кукі
+        String token = getCookieValue(request, "access_token");
+        if (StringUtils.hasText(token)) {
+            logger.debug("JWT found in access_token cookie");
+            return token;
+        }
+
+        logger.debug("No JWT found in Authorization header or cookies");
+        return null;
+    }
+
+    private String getCookieValue(HttpServletRequest request, String name) {
+        if (request.getCookies() != null) {
+            for (Cookie cookie : request.getCookies()) {
+                if (cookie.getName().equals(name)) {
+                    return cookie.getValue();
+                }
+            }
         }
         return null;
     }
-} 
+}

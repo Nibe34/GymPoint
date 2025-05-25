@@ -7,6 +7,7 @@ import Footer from '../components/Footer/Footer';
 import AppRouter from '../components/AppRoutes';
 import { useContext } from 'react';
 import { Context } from '../main'
+import AnimatedBackground from './AnimatedBackground';
 
 
 function App() {
@@ -20,6 +21,7 @@ function App() {
     <BrowserRouter>
       <Header />
       <main>
+        <AnimatedBackground />
         <AppRouter />
       </main>
       <Footer />

@@ -168,8 +168,14 @@ public class UserServiceImpl implements UserService {
         // Create cookies
         ResponseCookie accessTokenCookie = cookieService.createAccessTokenCookie(accessToken);
         ResponseCookie refreshTokenCookie = cookieService.createRefreshTokenCookie(refreshToken.getToken());
-        
-        return new AuthResponseDto(accessTokenCookie.toString(), refreshTokenCookie.toString(), user.getId());
+
+        return new AuthResponseDto(
+                accessTokenCookie.toString(),
+                refreshTokenCookie.toString(),
+                user.getId(),
+                accessToken,
+                refreshToken.getToken()
+        );
     }
 
     private void setBaseUserFields(User user, RegisterDto registerDto) {
@@ -209,8 +215,14 @@ public class UserServiceImpl implements UserService {
             // Create cookies
             ResponseCookie accessTokenCookie = cookieService.createAccessTokenCookie(accessToken);
             ResponseCookie refreshTokenCookie = cookieService.createRefreshTokenCookie(refreshToken.getToken());
-            
-            return new AuthResponseDto(accessTokenCookie.toString(), refreshTokenCookie.toString(), user.getId());
+
+            return new AuthResponseDto(
+                    accessTokenCookie.toString(),
+                    refreshTokenCookie.toString(),
+                    user.getId(),
+                    accessToken,
+                    refreshToken.getToken()
+            );
         } catch (AuthenticationException e) {
             logger.error("Authentication failed for user: {}", loginDto.getEmail(), e);
             throw e;
@@ -268,8 +280,14 @@ public class UserServiceImpl implements UserService {
             // Create cookies
             ResponseCookie accessTokenCookie = cookieService.createAccessTokenCookie(accessToken);
             ResponseCookie refreshTokenCookie = cookieService.createRefreshTokenCookie(newRefreshToken.getToken());
-            
-            return new AuthResponseDto(accessTokenCookie.toString(), refreshTokenCookie.toString(), user.getId());
+
+            return new AuthResponseDto(
+                    accessTokenCookie.toString(),
+                    refreshTokenCookie.toString(),
+                    user.getId(),
+                    accessToken,
+                    refreshToken.getToken()
+            );
         } catch (IllegalArgumentException e) {
             logger.error("Invalid refresh token: {}", e.getMessage());
             throw e;

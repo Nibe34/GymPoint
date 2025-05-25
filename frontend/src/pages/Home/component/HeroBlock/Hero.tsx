@@ -31,4 +31,5 @@ const Hero = ({ title, description, to = '/coaches' }: HeroProps) => {
   );
 };
 
+
 export default Hero;

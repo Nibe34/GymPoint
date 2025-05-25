@@ -303,9 +303,13 @@ public class UserServiceImpl implements UserService {
         if (authentication == null || !authentication.isAuthenticated()) {
             throw new RuntimeException("No authenticated user found");
         }
-        
+
         String email = authentication.getName();
-        return getUserByEmail(email);
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found with email: " + email));
+
+        return userMapper.toUserDto(user);
+    }
 
     private String getRefreshTokenFromCookies(HttpServletRequest request) {
         Cookie[] cookies = request.getCookies();
@@ -317,19 +321,5 @@ public class UserServiceImpl implements UserService {
                     .orElse(null);
         }
         return null;
-    }
-
-    @Override
-    public UserDto getCurrentUser() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication == null || !authentication.isAuthenticated()) {
-            throw new RuntimeException("No authenticated user found");
-        }
-
-        String email = authentication.getName();
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found with email: " + email));
-
-        return userMapper.toUserDto(user);
     }
 } 

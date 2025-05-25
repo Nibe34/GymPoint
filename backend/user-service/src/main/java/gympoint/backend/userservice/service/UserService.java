@@ -23,5 +23,4 @@ public interface UserService {
     AuthResponseDto authenticateUser(LoginDto loginDto);
     UserDto getCurrentUser();
     AuthResponseDto refreshToken(RefreshTokenRequestDto request, HttpServletRequest httpRequest);
-    UserDto getCurrentUser();
-} 
+}

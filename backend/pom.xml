@@ -14,5 +14,6 @@
         <module>gympoint-common</module>
         <module>user-service</module>
         <module>training-service</module>
+        <module>workout-service</module>
     </modules>
 </project>

@@ -32,8 +32,8 @@
     <dependencies>
         <!-- це залежність до спільної теки -->
         <dependency>
-            <groupId>GymPoint.backend</groupId>
-            <artifactId>common</artifactId>
+            <groupId>gympoint.backend</groupId>
+            <artifactId>gympoint-common</artifactId>
             <version>0.0.1-SNAPSHOT</version>
         </dependency>
 

@@ -14,13 +14,11 @@ public interface TrainingSessionMapper {
     @Mapping(target = "trainerId", source = "trainerId")
     @Mapping(target = "startTime", source = "startTime")
     @Mapping(target = "maxParticipants", source = "maxParticipants")
-    @Mapping(target = "isAvailable", source = "isAvailable")
     TrainingSessionDto toDto(TrainingSession trainingSession);
 
     @Mapping(target = "id", source = "id")
     @Mapping(target = "trainerId", source = "trainerId")
     @Mapping(target = "startTime", source = "startTime")
     @Mapping(target = "maxParticipants", source = "maxParticipants")
-    @Mapping(target = "isAvailable", source = "isAvailable")
     TrainingSession toEntity(TrainingSessionDto trainingSessionDto);
 } 

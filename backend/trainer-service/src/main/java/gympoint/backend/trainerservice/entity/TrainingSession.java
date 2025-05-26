@@ -25,7 +25,4 @@ public class TrainingSession {
 
     @Column(name = "max_participants")
     private Integer maxParticipants;
-
-    @Column(name = "is_available")
-    private Boolean isAvailable;
 } 

@@ -9,6 +9,4 @@ public interface TrainingSessionService {
     void deleteSession(Long id);
     TrainingSessionDto getSessionById(Long id);
     List<TrainingSessionDto> getSessionsByTrainerId(Long trainerId);
-    List<TrainingSessionDto> getAvailableSessions();
-    TrainingSessionDto updateAvailability(Long id, boolean isAvailable);
 } 

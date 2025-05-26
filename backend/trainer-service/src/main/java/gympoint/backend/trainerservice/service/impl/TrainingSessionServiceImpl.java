@@ -31,8 +31,6 @@ public class TrainingSessionServiceImpl implements TrainingSessionService {
     @PreAuthorize("hasRole('ROLE_TRAINER')")
     public TrainingSessionDto createSession(TrainingSessionDto sessionDto) {
         TrainingSession session = trainingSessionMapper.toEntity(sessionDto);
-        session.setIsAvailable(true);
-        
         TrainingSession savedSession = trainingSessionRepository.save(session);
         return trainingSessionMapper.toDto(savedSession);
     }
@@ -71,22 +69,4 @@ public class TrainingSessionServiceImpl implements TrainingSessionService {
                 .collect(Collectors.toList());
     }
 
-    @Override
-    public List<TrainingSessionDto> getAvailableSessions() {
-        return trainingSessionRepository.findByIsAvailableTrue()
-                .stream()
-                .map(trainingSessionMapper::toDto)
-                .collect(Collectors.toList());
-    }
-
-    @Override
-    @PreAuthorize("hasRole('ROLE_TRAINER')")
-    public TrainingSessionDto updateAvailability(Long id, boolean isAvailable) {
-        TrainingSession session = trainingSessionRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Training session not found"));
-        
-        session.setIsAvailable(isAvailable);
-        TrainingSession updatedSession = trainingSessionRepository.save(session);
-        return trainingSessionMapper.toDto(updatedSession);
-    }
 } 

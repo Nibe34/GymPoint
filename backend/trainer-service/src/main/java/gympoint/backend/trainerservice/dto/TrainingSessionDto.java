@@ -9,5 +9,4 @@ public class TrainingSessionDto {
     private Long trainerId;
     private LocalDateTime startTime;
     private Integer maxParticipants;
-    private Boolean isAvailable;
 } 

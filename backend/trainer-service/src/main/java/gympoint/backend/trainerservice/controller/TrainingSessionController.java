@@ -53,15 +53,4 @@ public class TrainingSessionController {
         return ResponseEntity.ok(trainingSessionService.getSessionsByTrainerId(trainerId));
     }
 
-    @GetMapping("/available")
-    @Operation(summary = "Get all available training sessions")
-    public ResponseEntity<List<TrainingSessionDto>> getAvailableSessions() {
-        return ResponseEntity.ok(trainingSessionService.getAvailableSessions());
-    }
-
-    @PatchMapping("/{id}/availability")
-    @Operation(summary = "Update training session availability")
-    public ResponseEntity<TrainingSessionDto> updateAvailability(@PathVariable Long id, @RequestParam boolean isAvailable) {
-        return ResponseEntity.ok(trainingSessionService.updateAvailability(id, isAvailable));
-    }
 } 

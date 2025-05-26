@@ -8,5 +8,4 @@ import java.util.List;
 public interface TrainingSessionRepository extends JpaRepository<TrainingSession, Long> {
     List<TrainingSession> findByTrainerId(Long trainerId);
     List<TrainingSession> findByTrainerIdAndStartTimeAfter(Long trainerId, LocalDateTime startTime);
-    List<TrainingSession> findByIsAvailableTrue();
 } 

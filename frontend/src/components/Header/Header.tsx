@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { observer } from 'mobx-react-lite';
 import Navigation from '../Navigation/Navigation';
 import Modal from '../Modal/Modal';
@@ -14,6 +14,7 @@ const Header = observer(() => {
     const { store } = useContext(Context);
     const [isOpenModal, setIsModalOpen] = useState(false);
     const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+    const navigate = useNavigate()
 
     useEffect(() => {
         console.log('isAuth змінився:', store.isAuth);
@@ -34,13 +35,16 @@ const Header = observer(() => {
                 </div>
 
                 <div className={styles.desktopMenu}>
+                    <Navigation />
+
                     {store.isAuth ? (
-                        <Button onClick={() => store.logout()}>Logout</Button>
+                        <Button onClick={() => navigate("/profile")}>My profile</Button>
                     ) : (
                         <Button onClick={() => setIsModalOpen(true)}>Login</Button>
                     )}
-                    <Navigation />
                 </div>
+
+
 
                 <div className={styles.burgerMenu}>
                     <AntButton

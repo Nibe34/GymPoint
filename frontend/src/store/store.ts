@@ -39,6 +39,7 @@ async login(email: string, password: string) {
             const userResponse = await UserService.fetchCurrentUser();
             console.log('Дані користувача з /users/me:', userResponse.data);
             this.setUser(userResponse.data);
+            return response;
         } else {
             throw new Error('accessToken відсутній у відповіді');
         }

@@ -1,0 +1,63 @@
+.coachGrid {
+  display: grid;
+  gap: 28px;
+  grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+  padding: 20px 10px;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.coachCard {
+  background: #fff;
+  border-radius: 20px;
+  box-shadow: 0 4px 14px #0002;
+  padding: 18px 20px 20px 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transition: box-shadow 0.18s;
+}
+
+.coachCard:hover {
+  box-shadow: 0 6px 18px #0003;
+}
+
+.avatar img {
+  width: 92px;
+  height: 92px;
+  object-fit: cover;
+  border-radius: 50%;
+  margin-bottom: 12px;
+  background: #e5e5e5;
+}
+
+.info h3 {
+  margin: 0 0 8px 0;
+  font-size: 1.3rem;
+  color: #111;
+}
+
+.info p {
+  margin: 3px 0;
+  color: #222;
+  font-size: 1.02rem;
+  line-height: 1.4;
+}
+
+.email {
+  color: #78bd8d;
+  font-size: 0.97rem;
+  margin-top: 7px;
+  word-break: break-all;
+}
+
+@media (max-width: 700px) {
+  .coachGrid {
+    padding: 10px 2px;
+    gap: 12px;
+  }
+  .coachCard {
+    padding: 10px 10px 14px 10px;
+  }
+}

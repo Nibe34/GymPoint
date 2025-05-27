@@ -7,9 +7,9 @@ import styles from './Navigation.module.css';
 const Nav: React.FC = () => {
   return (
     <nav>
-      <ul className= {styles.nav}>
+      <ul className={styles.nav}>
         {navItems.map((item) => (
-          <li key={item.path}>
+          <li key={item.path} className={styles.li}>
             <NavLink
               to={item.path}
               className={styles.link}

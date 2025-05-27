@@ -54,6 +54,7 @@ public class UserSubscriptionService {
         userSubscription.setStartDate(now);
         userSubscription.setEndDate(now.plusDays(subscription.getDurationDays()));
         userSubscription.setIsActive(true);
+        userSubscription.setRemainingVisits(subscription.getVisitsNumber());
 
         return userSubscriptionMapper.toDTO(userSubscriptionRepository.save(userSubscription));
     }

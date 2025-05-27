@@ -4,10 +4,28 @@ import type { AuthResponse } from '../Models/responce/AutResponse';
 
 export const BASE_URL = 'http://localhost:8081/api/';
 
+
+//httpTrainerApi.ts
 const $api = axios.create({
     withCredentials: true,
     baseURL: BASE_URL
 });
+
+//httpTrainerApi.ts
+export const $trainerApi = axios.create({
+  baseURL: "http://localhost:8083/api/",
+  withCredentials: true,
+});
+
+
+$trainerApi.interceptors.request.use((config) => {
+  const token = localStorage.getItem("token");
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+
 
 $api.interceptors.request.use((config: InternalAxiosRequestConfig) => {
     // Не додаємо Authorization для /auth/* і /users/me

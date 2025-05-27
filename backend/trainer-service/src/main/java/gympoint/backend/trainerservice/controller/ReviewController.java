@@ -66,4 +66,5 @@ public class ReviewController {
             @RequestParam Long trainerId) {
         return ResponseEntity.ok(reviewService.hasClientReviewedTrainer(clientId, trainerId));
     }*/
-} 
+}
+

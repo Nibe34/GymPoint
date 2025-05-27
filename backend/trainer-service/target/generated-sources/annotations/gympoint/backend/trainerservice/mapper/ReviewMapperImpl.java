@@ -7,8 +7,8 @@ import org.springframework.stereotype.Component;
 
 @Generated(
     value = "org.mapstruct.ap.MappingProcessor",
-    date = "2025-05-24T22:09:10+0300",
-    comments = "version: 1.5.5.Final, compiler: javac, environment: Java 22.0.2 (Oracle Corporation)"
+    date = "2025-05-27T14:23:10+0300",
+    comments = "version: 1.5.5.Final, compiler: javac, environment: Java 17.0.13 (BellSoft)"
 )
 @Component
 public class ReviewMapperImpl implements ReviewMapper {

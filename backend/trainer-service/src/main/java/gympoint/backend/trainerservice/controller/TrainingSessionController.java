@@ -64,4 +64,5 @@ public class TrainingSessionController {
     public ResponseEntity<TrainingSessionDto> updateAvailability(@PathVariable Long id, @RequestParam boolean isAvailable) {
         return ResponseEntity.ok(trainingSessionService.updateAvailability(id, isAvailable));
     }
-} 
+}
+

@@ -8,3 +8,11 @@ header .nav {
 .link {
     font-size: 18px;
 }
+
+
+@media (max-width: 800px) {
+.li {
+    text-align: center;
+    padding: 1em 0;
+  }
+}

@@ -1,5 +1,4 @@
-// pages/MePage.tsx
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import { Card, Spin, Alert, Descriptions, Button, message } from "antd";
 import UserService from "../../../services/UserService";
 import type { UserType } from "../../../Models/users/UserType";
@@ -7,8 +6,13 @@ import Roles from "../../../Models/users/Roles";
 import EditProfileModal from "./component/EditProfileModal";
 import TrainerService from "../../../services/TrainerService";
 import ClientService from "../../../services/ClientService";
+import { Context } from "../../../main"; // <-- Додаємо
+import { useNavigate } from "react-router-dom"; // <-- Додаємо
+import TrainerSessions from "./component/TrainerSessions";
 
 const MyProfile = () => {
+    const { store } = useContext(Context); // <-- доступ до store
+    const navigate = useNavigate();
     const [user, setUser] = useState<UserType | null>(null);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string>("");
@@ -46,6 +50,11 @@ const MyProfile = () => {
         } catch (err) {
             message.error("Помилка при оновленні профілю.");
         }
+    };
+
+    const handleLogout = () => {
+        store.logout();
+        navigate("/"); // або '/login', якщо так задумано
     };
 
     if (error) return <Alert message="Помилка" description={error} type="error" showIcon />;
@@ -89,8 +98,21 @@ const MyProfile = () => {
                             </>
                         )}
                     </Descriptions>
+
+                    {/* --- Кнопка Logout --- */}
+                    <div style={{ display: "flex", justifyContent: "flex-end", marginTop: 20 }}>
+                        <Button danger onClick={handleLogout}>
+                            Вийти
+                        </Button>
+                    </div>
                 </Card>
             )}
+
+
+            {user?.role === Roles.trainer && (
+                <TrainerSessions trainerId={Number(user.id)} />
+            )}
+
 
             {user && (
                 <EditProfileModal

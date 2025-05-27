@@ -1,31 +1,74 @@
 .hero {
-background-image: url("/Hero.png");
-background-repeat: no-repeat;
-background-size: cover;
+  background-image: url("/Hero.png");
+  background-repeat: no-repeat;
+  background-size: cover;
+  min-height: 60vh;
+  display: flex;
+  align-items: center;
 }
 
-
+.hero__container {
+  width: 100%;
+  margin: 0 auto;
+}
 
 .content {
-    padding: 5em 0 5em 5em;
-    text-align: start;
+  padding: 5em 0 5em 5em;
+  text-align: start;
 }
 
-
 .title {
-    font-size: 5rem;
-    color: white;
+  font-size: 4rem;
+  color: white;
+  line-height: 1.1;
 }
 
 .title span { 
-    color: #84CC16;
+  color: #84CC16;
 }
 
 .description {
-    color: #D1D5DB;
-    font-size: 3rem;
+  color: #D1D5DB;
+  font-size: 2rem;
+  margin-top: 1.2em;
 }
 
 .buttonContainer {
-    padding-top: 3rem;
+  padding-top: 3rem;
+}
+
+/* ---------- Tablet ---------- */
+@media (max-width: 900px) {
+  .content {
+    padding: 3em 1.5em 3em 5em;
+  }
+  .title {
+    font-size: 2.6rem;
+  }
+  .description {
+    font-size: 1.2rem;
+  }
+  .buttonContainer {
+    padding-top: 2rem;
+  }
+}
+
+/* ---------- Mobile ---------- */
+@media (max-width: 600px) {
+  .hero {
+    min-height: 45vh;
+  }
+  .content {
+    padding: 2em 0.5em 2em 5em;
+  }
+  .title {
+    font-size: 1.7rem;
+  }
+  .description {
+    font-size: 1rem;
+    margin-top: 1em;
+  }
+  .buttonContainer {
+    padding-top: 1.2rem;
+  }
 }

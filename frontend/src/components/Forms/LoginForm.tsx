@@ -1,7 +1,7 @@
-import React, { useContext } from 'react';
+import React, { useContext, useState } from 'react';
 import type { FormProps } from 'antd';
-import { Button, Form, Input } from 'antd';
-import { NavLink } from 'react-router-dom';
+import { Button, Form, Input, Alert } from 'antd';
+import { NavLink, useNavigate } from 'react-router-dom';
 import styles from './LoginForm.module.css'
 import { Context } from '../../main';
 
@@ -10,30 +10,35 @@ type FieldType = {
   password: string;
 };
 
-
 interface ModalProps {
   setActive: (value: boolean) => void;
 }
 
-
-
 const LoginForm = ({ setActive }: ModalProps) => {
-
   const { store } = useContext(Context);
+  const navigate = useNavigate();
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   const onFinish: FormProps<FieldType>['onFinish'] = async (values) => {
+    setErrorMsg(null); // Скидаємо попередню помилку перед новим логіном
     try {
-      console.log('Success:', values);
-      await store.login(values.email, values.password); // Чекаємо завершення логіну
-      setActive(false); // Закриваємо модалку після успішного входу
+      const response = await store.login(values.email, values.password);
+      if (response && response.status === 200) {
+        setActive(false);
+        navigate("/profile");
+      }
     } catch (error) {
-      console.error('Помилка входу:', error); // Логуємо помилку, якщо логін не вдався
+      setErrorMsg("Невірний email або пароль.");
+      // Можна логувати детальніше
+      console.error('Помилка входу:', error);
     }
   };
 
   const onFinishFailed: FormProps<FieldType>['onFinishFailed'] = (errorInfo) => {
+    setErrorMsg(null); // При валідації не показуємо помилку логіну
     console.log('Failed:', errorInfo);
   };
+
   return (
     <Form
       name="basic"
@@ -61,12 +66,22 @@ const LoginForm = ({ setActive }: ModalProps) => {
         <Input.Password />
       </Form.Item>
 
+      {/* Додаємо показ помилки якщо є */}
+      {errorMsg && (
+        <Form.Item wrapperCol={{ offset: 8, span: 16 }}>
+          <Alert message={errorMsg} type="error" showIcon />
+        </Form.Item>
+      )}
+
       <Form.Item label={null}>
-        <Button type="primary" htmlType="submit" onSubmit={() => setActive(false)}>
+        <Button type="primary" htmlType="submit">
           Login
         </Button>
       </Form.Item>
-      <NavLink to={"/registration"} className={styles.registration} onClick={() => setActive(false)}>Don't have an account? Register</NavLink>
+
+      <NavLink to={"/registration"} className={styles.registration} onClick={() => setActive(false)}>
+        Don't have an account? Register
+      </NavLink>
     </Form>
   )
 };

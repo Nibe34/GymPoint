@@ -14,19 +14,19 @@ spring:
         - id: user-service
           uri: lb://user-service
           predicates:
-            - Path=/api/users/**, /api/auth/**
+            - Path=/api/users/**, /api/trainers/**, /api/clients/**, /api/admins/**,  /api/auth/**
         - id: training-service
           uri: lb://training-service
           predicates:
-            - Path=/api/trainings/**
+            - Path=/api/training-types/**, /api/reviews/**, /api/training-sessions/**
         - id: workout-service
           uri: lb://workout-service
           predicates:
-            - Path=/api/workouts/**
+            - Path=/api/workout-bookings/**
         - id: subscription-service
           uri: lb://subscription-service
           predicates:
-            - Path=/api/subscriptions/**
+            - Path=/api/subscriptions/**, /api/my-subscriptions/**
 
 eureka:
   client:

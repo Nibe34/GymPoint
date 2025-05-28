@@ -1,24 +1,27 @@
 package gympoint.backend.userservice.entity;
 
-import jakarta.persistence.*;
+import javax.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.time.LocalDate;
 
-@Data
-@EqualsAndHashCode(callSuper = true)
 @Entity
 @Table(name = "clients")
 @DiscriminatorValue("ROLE_CLIENT")
+@Getter
+@Setter
+@EqualsAndHashCode(callSuper = true)
 public class Client extends User {
-    @Column(nullable = false)
+    @Column(name = "date_of_birth")
     private LocalDate dateOfBirth;
     
-    @Column(nullable = false)
+    @Column(name = "phone_number")
     private String phoneNumber;
     
-    @Column(nullable = false)
+    @Column(name = "address")
     private String address;
     
     @Column(nullable = false)

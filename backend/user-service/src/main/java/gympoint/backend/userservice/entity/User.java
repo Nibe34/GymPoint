@@ -1,7 +1,7 @@
 package gympoint.backend.userservice.entity;
 
 import gympoint.backend.common.enums.Role;
-import jakarta.persistence.*;
+import javax.persistence.*;
 import lombok.Data;
 
 @Data

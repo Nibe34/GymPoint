@@ -38,7 +38,7 @@ public interface UserMapper {
         throw new IllegalArgumentException("Unknown user type: " + user.getClass().getName());
     }
 
-    private void mapCommonFields(User user, UserDto dto) {
+    default void mapCommonFields(User user, UserDto dto) {
         dto.setId(user.getId());
         dto.setEmail(user.getEmail());
         dto.setFirstName(user.getFirstName());

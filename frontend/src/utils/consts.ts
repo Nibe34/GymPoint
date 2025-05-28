@@ -6,6 +6,6 @@ export const COACHES_ROUTE = '/coaches'
 export const REGISTRATION_ROUTE = '/registration'
 export const PROFILE_ROUTE = '/profile'
 export const HOME_ROUTE = '/'
-
+export const COACH_ROUTE = '/coaches/:id'
 
 

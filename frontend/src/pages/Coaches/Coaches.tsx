@@ -2,11 +2,13 @@ import React, { useEffect, useState } from "react";
 import TrainerService from "../../services/TrainerService";
 import type ITrainer from "../../Models/users/ITrainer";
 import styles from "./CoachesPage.module.css";
+import { useNavigate } from "react-router-dom"; // <-- Додаємо!
 
 const CoachesPage: React.FC = () => {
     const [trainers, setTrainers] = useState<ITrainer[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const navigate = useNavigate(); // <-- Додаємо!
 
     useEffect(() => {
         TrainerService.fetchTrainers()
@@ -23,8 +25,7 @@ const CoachesPage: React.FC = () => {
             {trainers.map(trainer => (
                 <div className={styles.coachCard} key={trainer.id}>
                     <div className={styles.avatar}>
-                        {/* Можна додати аватар якщо буде */}
-                        <img src="/trainer-default.png" alt="avatar" />
+                        <img src="/trainer-default.svg" alt="avatar" />
                     </div>
                     <div className={styles.info}>
                         <h3>{trainer.firstName} {trainer.lastName}</h3>
@@ -32,6 +33,12 @@ const CoachesPage: React.FC = () => {
                         <p><strong>Сертифікація:</strong> {trainer.certification}</p>
                         <p>{trainer.bio}</p>
                         <p className={styles.email}>{trainer.email}</p>
+                        <button
+                            className={styles.viewBtn}
+                            onClick={() => navigate(`/coaches/${trainer.id}`)}
+                        >
+                            Переглянути тренера
+                        </button>
                     </div>
                 </div>
             ))}

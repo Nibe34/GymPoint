@@ -3,13 +3,12 @@ import {$trainerApi} from "../http";
 import type { AxiosResponse } from "axios";
 
 export interface TrainingSessionDto {
-  id: number;
+  id?: number;
   trainerId: number;
-  trainingTypeId: number;
   startTime: string;
-  endTime: string;
-  isAvailable: boolean;
-  // ...інші поля, якщо є
+  endTime?: string;
+  isAvailable?: boolean;
+  maxParticipants: number;
 }
 
 export default class TrainingSessionService {

@@ -18,6 +18,22 @@ export const $trainerApi = axios.create({
 });
 
 
+//httpTrainerApi.ts
+export const $BookingApi = axios.create({
+  baseURL: "http://localhost:8084/api/",
+  withCredentials: true,
+});
+
+$BookingApi.interceptors.request.use((config) => {
+  const token = localStorage.getItem("token");
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+
+
+
 $trainerApi.interceptors.request.use((config) => {
   const token = localStorage.getItem("token");
   if (token) {
@@ -47,10 +63,12 @@ $api.interceptors.response.use(
     (response) => response,
     async (error) => {
         const originalRequest = error.config;
-        // Додаємо і 401, і 403
+
+        // Якщо вже пробували refresh або сам refresh неавторизований — не повторювати!
         if (
             (error.response?.status === 401 || error.response?.status === 403) &&
-            !originalRequest._retry
+            !originalRequest._retry &&
+            !originalRequest.url.includes("/auth/refresh")
         ) {
             originalRequest._retry = true;
             try {
@@ -59,13 +77,16 @@ $api.interceptors.response.use(
                 originalRequest.headers['Authorization'] = `Bearer ${response.data.accessToken}`;
                 return $api(originalRequest);
             } catch (refreshError) {
+                // Якщо refresh теж не спрацював — логаут і редірект
                 localStorage.removeItem('token');
                 window.location.href = '/login';
                 return Promise.reject(refreshError);
             }
         }
+        // Якщо це сам /auth/refresh — не намагатись повторити
         return Promise.reject(error);
     }
 );
+
 
 export default $api;

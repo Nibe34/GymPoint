@@ -61,3 +61,19 @@
     padding: 10px 10px 14px 10px;
   }
 }
+
+
+.viewBtn {
+    margin-top: 12px;
+    padding: 8px 18px;
+    background: #56b856;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s;
+}
+.viewBtn:hover {
+    background: #419441;
+}

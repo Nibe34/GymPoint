@@ -13,4 +13,9 @@ export default class TrainerService {
   static async fetchTrainers() {
     return $api.get<ITrainer[]>("/trainers");
   }
+
+  static async fetchTrainerById(id: string) {
+  return $api.get<ITrainer>(`/trainers/${id}`);
+}
+
 }

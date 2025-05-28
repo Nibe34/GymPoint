@@ -7,9 +7,16 @@ import MyProfile from "./pages/Profile/MyProfile/Profile";
 import Registration from "./pages/Registration/Registration";
 import Services from "./pages/Services";
 import Shop from "./pages/Shop";
-import { ABOUT_ROUTE, ADMIN_ROUTE, COACHES_ROUTE, HOME_ROUTE, PROFILE_ROUTE, REGISTRATION_ROUTE, SERVICES_ROUTE, SHOP_ROUTE } from "./utils/consts";
+import CoachProfilePage from "./pages/Profile/CoachProfile/CoachProfilePage"; // Новий компонент
+
+import { ABOUT_ROUTE, ADMIN_ROUTE, COACHES_ROUTE, HOME_ROUTE, PROFILE_ROUTE, REGISTRATION_ROUTE, SERVICES_ROUTE, SHOP_ROUTE, COACH_ROUTE } from "./utils/consts";
+
 
 export const authRoutes = [
+  {
+     path: COACH_ROUTE,
+    Component: CoachProfilePage
+  },
   {
     path: PROFILE_ROUTE,
     Component: MyProfile

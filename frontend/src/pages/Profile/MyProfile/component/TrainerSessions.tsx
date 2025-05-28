@@ -27,12 +27,7 @@ const TrainerSessions = ({ trainerId }: { trainerId: number }) => {
             <ul>
                 {sessions.map(s => (
                     <li key={s.id}>
-                        <b>{s.startTime.slice(0, 16)} — {s.endTime.slice(0, 16)}</b>
-                        {" "}
-                        {s.isAvailable
-                            ? <span style={{ color: 'green' }}>Available</span>
-                            : <span style={{ color: 'red' }}>Booked</span>
-                        }
+                        <b>{s.startTime.slice(0, 16)}</b>
                     </li>
                 ))}
                 {sessions.length === 0 && <li>No sessions yet.</li>}

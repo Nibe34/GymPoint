@@ -9,6 +9,7 @@ import ClientService from "../../../services/ClientService";
 import { Context } from "../../../main"; // <-- Додаємо
 import { useNavigate } from "react-router-dom"; // <-- Додаємо
 import TrainerSessions from "./component/TrainerSessions";
+import TrainerSessionsCalendar from "./component/TrainerSessionsCalendar";
 
 const MyProfile = () => {
     const { store } = useContext(Context); // <-- доступ до store
@@ -108,10 +109,10 @@ const MyProfile = () => {
                 </Card>
             )}
 
-
-            {user?.role === Roles.trainer && (
-                <TrainerSessions trainerId={Number(user.id)} />
+            {user && user.role === Roles.trainer && (
+                <TrainerSessionsCalendar trainerId={Number(user.id)} />
             )}
+
 
 
             {user && (

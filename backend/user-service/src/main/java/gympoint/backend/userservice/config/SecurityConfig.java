@@ -1,5 +1,6 @@
 package gympoint.backend.userservice.config;
 
+import gympoint.backend.userservice.security.CacheControlFilter;
 import gympoint.backend.userservice.security.CustomUserDetailsService;
 import gympoint.backend.userservice.security.JwtAuthenticationFilter;
 import lombok.RequiredArgsConstructor;
@@ -16,15 +17,10 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-import org.springframework.web.filter.OncePerRequestFilter;
-import jakarta.servlet.FilterChain;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import java.io.IOException;
 import java.util.Arrays;
 
 @Configuration
@@ -35,6 +31,7 @@ public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
     private final CustomUserDetailsService userDetailsService;
+    private final CacheControlFilter cacheControlFilter;
 
     @Bean
     public DaoAuthenticationProvider authenticationProvider() {
@@ -50,8 +47,14 @@ public class SecurityConfig {
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/auth/login", "/api/auth/register", "/api/auth/refresh").permitAll()
-                .requestMatchers("/v3/api-docs/**", "/swagger-ui/**", "/swagger-ui.html").permitAll()
+                .requestMatchers(
+                    new AntPathRequestMatcher("/api/auth/login"),
+                    new AntPathRequestMatcher("/api/auth/register"),
+                    new AntPathRequestMatcher("/api/auth/refresh"),
+                    new AntPathRequestMatcher("/v3/api-docs/**"),
+                    new AntPathRequestMatcher("/swagger-ui/**"),
+                    new AntPathRequestMatcher("/swagger-ui.html")
+                ).permitAll()
                 .anyRequest().authenticated()
             )
             .sessionManagement(session -> session
@@ -59,16 +62,7 @@ public class SecurityConfig {
             )
             .authenticationProvider(authenticationProvider())
             .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
-            .addFilterAfter(new OncePerRequestFilter() {
-                @Override
-                protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
-                        throws ServletException, IOException {
-                    response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
-                    response.setHeader("Pragma", "no-cache");
-                    response.setHeader("Expires", "0");
-                    filterChain.doFilter(request, response);
-                }
-            }, UsernamePasswordAuthenticationFilter.class);
+            .addFilterAfter(cacheControlFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }

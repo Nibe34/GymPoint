@@ -1,109 +1,60 @@
 package gympoint.backend.userservice.security;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
+import gympoint.backend.userservice.service.JwtService;
+import javax.servlet.FilterChain;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
+import org.springframework.lang.NonNull;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
-import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import jakarta.servlet.FilterChain;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.Cookie;
-
 import java.io.IOException;
-import java.util.Arrays;
 
 @Component
+@RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-    private static final Logger logger = LoggerFactory.getLogger(JwtAuthenticationFilter.class);
-
-    @Autowired
-    private JwtTokenProvider tokenProvider;
-
-    @Autowired
-    private UserDetailsService userDetailsService;
+    private final JwtService jwtService;
+    private final CustomUserDetailsService userDetailsService;
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
-            throws ServletException, IOException {
-        try {
-            logger.debug("Processing request to: {}", request.getRequestURI());
+    protected void doFilterInternal(
+            @NonNull HttpServletRequest request,
+            @NonNull HttpServletResponse response,
+            @NonNull FilterChain filterChain
+    ) throws ServletException, IOException {
+        final String authHeader = request.getHeader("Authorization");
+        final String jwt;
+        final String userEmail;
 
-            if (shouldNotFilter(request)) {
-                logger.debug("Skipping JWT filter for: {}", request.getRequestURI());
-                filterChain.doFilter(request, response);
-                return;
-            }
-
-            String jwt = getJwtFromRequest(request);
-            logger.debug("JWT token from request: {}", jwt != null ? "present" : "not present");
-
-            if (StringUtils.hasText(jwt) && tokenProvider.validateToken(jwt)) {
-                String username = tokenProvider.getUsernameFromJWT(jwt);
-                String role = tokenProvider.getRoleFromJWT(jwt);
-                logger.debug("Valid JWT token for user: {} with role: {}", username, role);
-
-                UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
-                        username, null, Arrays.asList(new SimpleGrantedAuthority(role)));
-                authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-
-                SecurityContextHolder.getContext().setAuthentication(authentication);
-                logger.debug("Authentication set in SecurityContext for user: {}", username);
-            } else {
-                logger.debug("Invalid or missing JWT token");
-            }
-        } catch (Exception ex) {
-            logger.error("Could not set user authentication in security context", ex);
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            filterChain.doFilter(request, response);
+            return;
         }
 
+        jwt = authHeader.substring(7);
+        userEmail = jwtService.extractUsername(jwt);
+
+        if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+            UserDetails userDetails = this.userDetailsService.loadUserByUsername(userEmail);
+            
+            if (jwtService.isTokenValid(jwt, userDetails)) {
+                UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
+                    userDetails,
+                    null,
+                    userDetails.getAuthorities()
+                );
+                authToken.setDetails(
+                    new WebAuthenticationDetailsSource().buildDetails(request)
+                );
+                SecurityContextHolder.getContext().setAuthentication(authToken);
+            }
+        }
         filterChain.doFilter(request, response);
-    }
-
-    @Override
-    protected boolean shouldNotFilter(HttpServletRequest request) {
-        String path = request.getServletPath();
-        boolean shouldNotFilter = path.startsWith("/api/auth") ||
-                path.startsWith("/v3/api-docs") ||
-                path.startsWith("/swagger-ui");
-        logger.debug("Checking if should filter path: {} - result: {}", path, shouldNotFilter);
-        return shouldNotFilter;
-    }
-
-    private String getJwtFromRequest(HttpServletRequest request) {
-        // Спочатку перевіряємо заголовок Authorization
-        String bearerToken = request.getHeader("Authorization");
-        if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {
-            logger.debug("JWT found in Authorization header");
-            return bearerToken.substring(7);
-        }
-
-        // Якщо заголовок відсутній, перевіряємо кукі
-        String token = getCookieValue(request, "access_token");
-        if (StringUtils.hasText(token)) {
-            logger.debug("JWT found in access_token cookie");
-            return token;
-        }
-
-        logger.debug("No JWT found in Authorization header or cookies");
-        return null;
-    }
-
-    private String getCookieValue(HttpServletRequest request, String name) {
-        if (request.getCookies() != null) {
-            for (Cookie cookie : request.getCookies()) {
-                if (cookie.getName().equals(name)) {
-                    return cookie.getValue();
-                }
-            }
-        }
-        return null;
     }
 }

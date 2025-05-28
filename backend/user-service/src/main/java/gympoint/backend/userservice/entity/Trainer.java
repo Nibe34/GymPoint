@@ -1,20 +1,23 @@
 package gympoint.backend.userservice.entity;
 
-import jakarta.persistence.*;
+import javax.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.Setter;
 
-@Data
-@EqualsAndHashCode(callSuper = true)
 @Entity
 @Table(name = "trainers")
 @DiscriminatorValue("ROLE_TRAINER")
+@Getter
+@Setter
+@EqualsAndHashCode(callSuper = true)
 public class Trainer extends User {
-    @Column(nullable = false)
-    private String bio;
+    @Column(name = "specialization")
+    private String specialization;
 
     @Column(nullable = false)
-    private String specialization;
+    private String bio;
 
     @Column(nullable = false)
     private String certification;

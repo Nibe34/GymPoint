@@ -1,6 +1,6 @@
 package gympoint.backend.userservice.entity;
 
-import jakarta.persistence.*;
+import javax.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.slf4j.Logger;

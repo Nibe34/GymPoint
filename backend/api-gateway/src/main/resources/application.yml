@@ -15,26 +15,36 @@ spring:
           uri: lb://auth-service
           predicates:
             - Path=/api/auth/**
-          filters:
-            - StripPrefix=1
         - id: user-service
           uri: lb://user-service
           predicates:
             - Path=/api/users/**
           filters:
-            - StripPrefix=1
-        - id: training-service
+            - RewritePath=/api/users/(?<segment>.*), /api/users/$\{segment}
+        - id: training-service-types
           uri: lb://training-service
           predicates:
-            - Path=/api/training-types/**, /api/reviews/**, /api/training-sessions/**
+            - Path=/api/training-types/**
+        - id: training-service-sessions
+          uri: lb://training-service
+          predicates:
+            - Path=/api/training-sessions/**
+        - id: training-service-reviews
+          uri: lb://training-service
+          predicates:
+            - Path=/api/reviews/**
         - id: workout-service
           uri: lb://workout-service
           predicates:
             - Path=/api/workout-bookings/**
-        - id: subscription-service
+        - id: subscription-service-subscriptions
           uri: lb://subscription-service
           predicates:
-            - Path=/api/subscriptions/**, /api/my-subscriptions/**
+            - Path=/api/subscriptions/**
+        - id: subscription-service-my-subscriptions
+          uri: lb://subscription-service
+          predicates:
+            - Path=/api/my-subscriptions/**
 
 eureka:
   client:

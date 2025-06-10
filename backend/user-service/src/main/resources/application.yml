@@ -56,9 +56,18 @@ springdoc:
     tagsSorter: alpha
     tryItOutEnabled: true
     filter: true
+    disable-swagger-default-url: true
+    disable-oauth2: true
   api-docs:
     path: /v3/api-docs
     enabled: true
+  default-consumes-media-type: application/json
+  default-produces-media-type: application/json
+  show-actuator: false
+  packages-to-scan: gympoint.backend.userservice.controller
+  paths-to-match: /api/**
+  security:
+    enabled: false
 
 debug: true
 

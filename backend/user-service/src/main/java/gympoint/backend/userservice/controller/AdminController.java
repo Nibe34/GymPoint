@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/admins")
+@RequestMapping("/api/users/admins")
 public class AdminController {
 
     private final AdminService adminService;
@@ -49,5 +49,11 @@ public class AdminController {
     public ResponseEntity<Void> deleteAdmin(@PathVariable Long id) {
         adminService.deleteAdmin(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/email/{email}")
+    public ResponseEntity<AdminDto> getAdminByEmail(@PathVariable String email) {
+        AdminDto admin = adminService.getAdminByEmail(email);
+        return ResponseEntity.ok(admin);
     }
 } 

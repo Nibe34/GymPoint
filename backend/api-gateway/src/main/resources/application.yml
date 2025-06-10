@@ -11,10 +11,18 @@ spring:
           enabled: true
           lower-case-service-id: true
       routes:
+        - id: auth-service
+          uri: lb://auth-service
+          predicates:
+            - Path=/api/auth/**
+          filters:
+            - StripPrefix=1
         - id: user-service
           uri: lb://user-service
           predicates:
-            - Path=/api/users/**, /api/trainers/**, /api/clients/**, /api/admins/**,  /api/auth/**
+            - Path=/api/users/**
+          filters:
+            - StripPrefix=1
         - id: training-service
           uri: lb://training-service
           predicates:
@@ -36,11 +44,25 @@ eureka:
     fetch-registry: true
   instance:
     prefer-ip-address: true
+    instance-id: ${spring.application.name}:${server.port}
 
 logging:
   level:
     org.springframework.cloud.gateway: DEBUG
-    org.springframework.http.server.reactive: DEBUG
-    org.springframework.web.reactive: DEBUG
-    reactor.netty: DEBUG
-    redisratelimiter: DEBUG 
+    org.springframework.security: DEBUG
+    com.netflix.eureka: DEBUG
+    com.netflix.discovery: DEBUG
+
+# Swagger configuration
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+    operationsSorter: method
+    tagsSorter: alpha
+    tryItOutEnabled: true
+    filter: true
+  api-docs:
+    path: /v3/api-docs
+    enabled: true
+
+debug: true 

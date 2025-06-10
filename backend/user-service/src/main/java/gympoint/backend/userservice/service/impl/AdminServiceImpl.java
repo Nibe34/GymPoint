@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -49,5 +50,12 @@ public class AdminServiceImpl extends AbstractUserService<Admin, AdminDto, Admin
     @Override
     public void deleteAdmin(Long id) {
         deleteUser(id);
+    }
+
+    @Override
+    public AdminDto getAdminByEmail(String email) {
+        Admin admin = repository.findByEmail(email)
+            .orElseThrow(() -> new RuntimeException("Admin not found with email: " + email));
+        return mapper.toDto(admin);
     }
 } 

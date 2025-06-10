@@ -2,6 +2,7 @@ package gympoint.backend.userservice.controller;
 
 import gympoint.backend.userservice.dto.TrainerCreateDto;
 import gympoint.backend.userservice.dto.TrainerDto;
+import gympoint.backend.userservice.dto.TrainerRegisterRequest;
 import gympoint.backend.userservice.service.TrainerService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -11,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/trainers")
+@RequestMapping("/api/users/trainers")
 public class TrainerController {
 
     private final TrainerService trainerService;
@@ -22,7 +23,17 @@ public class TrainerController {
     }
 
     @PostMapping
-    public ResponseEntity<TrainerDto> createTrainer(@RequestBody TrainerCreateDto trainerCreateDto) {
+    public ResponseEntity<TrainerDto> createTrainer(@RequestBody TrainerRegisterRequest request) {
+        TrainerCreateDto trainerCreateDto = new TrainerCreateDto();
+        trainerCreateDto.setEmail(request.getEmail());
+        trainerCreateDto.setPassword(request.getPassword());
+        trainerCreateDto.setFirstName(request.getFirstName());
+        trainerCreateDto.setLastName(request.getLastName());
+        trainerCreateDto.setRole(request.getRole());
+        trainerCreateDto.setBio(request.getBio());
+        trainerCreateDto.setCertification(request.getCertification());
+        trainerCreateDto.setSpecialization(request.getSpecialization());
+        
         TrainerDto createdTrainer = trainerService.createTrainer(trainerCreateDto);
         return new ResponseEntity<>(createdTrainer, HttpStatus.CREATED);
     }

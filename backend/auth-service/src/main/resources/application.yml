@@ -1,0 +1,106 @@
+spring:
+  application:
+    name: auth-service
+  datasource:
+    url: jdbc:postgresql://localhost:5432/gym_point_db
+    username: postgres
+    password: postgres
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+  main:
+    allow-bean-definition-overriding: true
+  cloud:
+    discovery:
+      enabled: true
+    loadbalancer:
+      retry:
+        enabled: true
+      ribbon:
+        enabled: false
+
+server:
+  port: 8085
+
+eureka:
+  instance:
+    prefer-ip-address: true
+    instance-id: ${spring.application.name}:${server.port}
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+    register-with-eureka: true
+    fetch-registry: true
+
+# Feign Configuration
+feign:
+  client:
+    config:
+      default:
+        connectTimeout: 5000
+        readTimeout: 5000
+        loggerLevel: full
+  hystrix:
+    enabled: true
+  compression:
+    request:
+      enabled: true
+    response:
+      enabled: true
+
+# JWT Configuration
+jwt:
+  secret: 404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970
+  expiration: 86400000 # 24 hours in milliseconds
+
+# Cookie Configuration
+app:
+  cookie:
+    domain: localhost
+    secure: false
+  jwtRefreshExpirationMs: 604800000 # 7 days in milliseconds
+
+# Logging configuration
+logging:
+  level:
+    org.springframework.security: DEBUG
+    gympoint.backend.authservice: DEBUG
+    org.springframework.web: DEBUG
+    com.netflix.eureka: DEBUG
+    com.netflix.discovery: DEBUG
+    feign: DEBUG
+    feign.Feign: DEBUG
+    feign.codec: DEBUG
+    feign.hystrix: DEBUG
+
+# Swagger configuration
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+    operationsSorter: method
+    tagsSorter: alpha
+    tryItOutEnabled: true
+    filter: true
+    disable-swagger-default-url: true
+    disable-oauth2: true
+    enabled: true
+    config-url: /v3/api-docs/swagger-config
+    url: /v3/api-docs
+  api-docs:
+    path: /v3/api-docs
+    enabled: true
+  default-consumes-media-type: application/json
+  default-produces-media-type: application/json
+  show-actuator: false
+  packages-to-scan: gympoint.backend.authservice.controller
+  paths-to-match: /api/**
+  security:
+    enabled: false
+
+debug: true 

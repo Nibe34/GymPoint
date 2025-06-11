@@ -11,4 +11,5 @@ public interface AdminService {
     List<AdminDto> getAllAdmins();
     AdminDto updateAdmin(Long id, AdminCreateDto adminCreateDto);
     void deleteAdmin(Long id);
+    AdminDto getAdminByEmail(String email);
 } 

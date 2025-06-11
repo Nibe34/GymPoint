@@ -7,6 +7,8 @@ import org.mapstruct.Mapping;
 import org.mapstruct.ObjectFactory;
 import org.springframework.stereotype.Component;
 
+import java.util.Collections;
+
 @Mapper(componentModel = "spring")
 public interface UserMapper {
 
@@ -60,5 +62,15 @@ public interface UserMapper {
 
     UserDto toUserDto(User user);
     User toUser(UserCreateDto dto);
+
+    default UserDetailsResponse toUserDetailsResponse(UserDto userDto) {
+        UserDetailsResponse response = new UserDetailsResponse();
+        response.setUsername(userDto.getEmail());
+        response.setPassword(userDto.getPassword());
+        response.setAuthorities(Collections.singletonList(userDto.getRole().name()));
+        response.setFirstName(userDto.getFirstName());
+        response.setLastName(userDto.getLastName());
+        return response;
+    }
 
 }

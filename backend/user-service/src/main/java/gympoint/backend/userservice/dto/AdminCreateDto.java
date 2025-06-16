@@ -7,6 +7,9 @@ import lombok.EqualsAndHashCode;
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class AdminCreateDto extends UserCreateDto {
+    private String department;
+    private String position;
+
     public AdminCreateDto() {
         this.setRole(Role.ROLE_ADMIN);
     }

@@ -1,0 +1,85 @@
+@startuml Service Security Interaction
+
+!define RECTANGLE class
+
+skinparam sequence {
+    ArrowColor DarkBlue
+    ActorBorderColor DarkBlue
+    LifeLineBorderColor DarkBlue
+    LifeLineBackgroundColor LightBlue
+    
+    ParticipantBorderColor DarkBlue
+    ParticipantBackgroundColor LightBlue
+    ParticipantFontName Impact
+    ParticipantFontSize 17
+    ParticipantFontStyle Bold
+    
+    ActorBackgroundColor LightBlue
+    ActorFontStyle Bold
+    ActorFontSize 17
+    ActorFontName Impact
+}
+
+actor Client
+participant "API Gateway" as Gateway
+participant "Auth Service" as Auth
+participant "Workout Service" as Workout
+participant "User Service" as User
+participant "Subscription Service" as Subscription
+
+== External Request Flow ==
+
+Client -> Gateway: HTTP Request with JWT
+activate Gateway
+
+Gateway -> Gateway: Validate JWT
+Gateway -> Gateway: Extract claims
+note right of Gateway
+  JWT Claims:
+  - sub (user id)
+  - roles
+  - exp (expiration)
+end note
+
+alt Token Valid
+    Gateway -> Workout: Forward request with JWT
+    activate Workout
+    Workout -> Workout: Validate JWT
+    Workout -> Workout: Check permissions
+    Workout --> Gateway: Response
+    deactivate Workout
+    Gateway --> Client: 200 OK
+else Token Invalid
+    Gateway --> Client: 401 Unauthorized
+end
+
+deactivate Gateway
+
+== Inter-Service Communication ==
+
+Workout -> User: GET /api/users/{id}\nAuthorization: Bearer {JWT}
+activate User
+
+User -> User: Validate JWT
+User -> User: Extract user info
+User -> User: Check permissions
+User --> Workout: User details
+
+deactivate User
+
+Workout -> Subscription: GET /api/subscriptions/{userId}\nAuthorization: Bearer {JWT}
+activate Subscription
+
+Subscription -> Subscription: Validate JWT
+Subscription -> Subscription: Check permissions
+Subscription --> Workout: Subscription status
+
+deactivate Subscription
+
+note right of Gateway
+  All services validate JWT
+  and check permissions
+  for each request
+end note
+
+@enduml 

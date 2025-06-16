@@ -1,0 +1,110 @@
+@startuml Test Coverage Report
+
+skinparam backgroundColor white
+skinparam defaultFontName Arial
+skinparam defaultFontSize 12
+skinparam defaultFontColor black
+
+title Test Coverage Report
+
+package "Auth Service (85%)" {
+    [Authentication Tests] as auth_auth #LightGreen
+    [Registration Tests] as auth_reg #LightGreen
+    [Token Management] as auth_token #LightGreen
+    [Security Tests] as auth_sec #LightBlue
+    [Integration Tests] as auth_int #LightYellow
+}
+
+package "User Service (75%)" {
+    [User Management] as user_mgmt #LightGreen
+    [Profile Operations] as user_prof #LightGreen
+    [Role Management] as user_role #LightGreen
+    [Security Tests] as user_sec #LightBlue
+    [Integration Tests] as user_int #LightYellow
+}
+
+package "Workout Service (70%)" {
+    [Booking Management] as workout_book #LightGreen
+    [Schedule Tests] as workout_sched #LightGreen
+    [Security Tests] as workout_sec #LightBlue
+    [Integration Tests] as workout_int #LightYellow
+}
+
+package "Training Service (80%)" {
+    [Session Management] as train_sess #LightGreen
+    [Type Management] as train_type #LightGreen
+    [Review System] as train_rev #LightGreen
+    [Security Tests] as train_sec #LightBlue
+    [Integration Tests] as train_int #LightYellow
+}
+
+package "Subscription Service (65%)" {
+    [Plan Management] as sub_plan #LightGreen
+    [Payment Tests] as sub_pay #LightGreen
+    [Security Tests] as sub_sec #LightBlue
+    [Integration Tests] as sub_int #LightYellow
+}
+
+package "Common (60%)" {
+    [DTO Tests] as common_dto #LightGreen
+    [Utility Tests] as common_util #LightGreen
+    [Security Tests] as common_sec #LightBlue
+    [Integration Tests] as common_int #LightYellow
+}
+
+note right of auth_auth
+  Authentication Tests:
+  - Login
+  - Logout
+  - Token Refresh
+  Coverage: 95%
+end note
+
+note right of auth_reg
+  Registration Tests:
+  - User Registration
+  - Email Validation
+  - Password Validation
+  Coverage: 90%
+end note
+
+note right of user_mgmt
+  User Management Tests:
+  - CRUD Operations
+  - Profile Updates
+  - Role Assignment
+  Coverage: 85%
+end note
+
+note right of workout_book
+  Booking Tests:
+  - Create Booking
+  - Cancel Booking
+  - Reschedule
+  Coverage: 80%
+end note
+
+note right of train_sess
+  Session Tests:
+  - Create Session
+  - Update Session
+  - Delete Session
+  Coverage: 85%
+end note
+
+note right of sub_plan
+  Subscription Tests:
+  - Plan Creation
+  - Plan Updates
+  - Plan Deletion
+  Coverage: 75%
+end note
+
+legend right
+  |Color|Type|
+  |<#LightGreen>|Unit Tests|
+  |<#LightBlue>|Security Tests|
+  |<#LightYellow>|Integration Tests|
+endlegend
+
+@enduml 

@@ -1,0 +1,71 @@
+@startuml GymPoint Service Interaction
+
+!define RECTANGLE class
+
+skinparam sequence {
+    ArrowColor DarkBlue
+    ActorBorderColor DarkBlue
+    LifeLineBorderColor DarkBlue
+    LifeLineBackgroundColor LightBlue
+    
+    ParticipantBorderColor DarkBlue
+    ParticipantBackgroundColor LightBlue
+    ParticipantFontName Impact
+    ParticipantFontSize 17
+    ParticipantFontStyle Bold
+    
+    ActorBackgroundColor LightBlue
+    ActorFontStyle Bold
+    ActorFontSize 17
+    ActorFontName Impact
+}
+
+actor Client
+participant "API Gateway" as Gateway
+participant "Auth Service" as Auth
+participant "User Service" as User
+participant "Workout Service" as Workout
+participant "Subscription Service" as Subscription
+database "Database" as DB
+
+== Authentication ==
+
+Client -> Gateway: POST /api/workout-bookings
+activate Gateway
+
+Gateway -> Auth: Validate JWT Token
+activate Auth
+Auth --> Gateway: Token Valid
+deactivate Auth
+
+== User Validation ==
+
+Gateway -> User: Get User Details
+activate User
+User -> DB: Query User
+DB --> User: User Data
+User --> Gateway: User Details
+deactivate User
+
+== Subscription Check ==
+
+Gateway -> Subscription: Check Active Subscription
+activate Subscription
+Subscription -> DB: Query Subscription
+DB --> Subscription: Subscription Data
+Subscription --> Gateway: Subscription Status
+deactivate Subscription
+
+== Workout Booking ==
+
+Gateway -> Workout: Create Workout Booking
+activate Workout
+Workout -> DB: Save Booking
+DB --> Workout: Booking Confirmed
+Workout --> Gateway: Booking Details
+deactivate Workout
+
+Gateway --> Client: 201 Created
+deactivate Gateway
+
+@enduml 

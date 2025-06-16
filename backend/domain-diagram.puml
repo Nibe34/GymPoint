@@ -1,0 +1,78 @@
+@startuml GymPoint Domain Model
+
+' Style settings
+skinparam classAttributeIconSize 0
+skinparam packageStyle rectangle
+skinparam linetype ortho
+
+' Main entities
+package "GymPoint Domain Model" {
+    class User {
+        +id: Long
+        +email: String
+        +password: String
+        +firstName: String
+        +lastName: String
+        +role: UserRole
+    }
+
+    class Client {
+        +dateOfBirth: LocalDate
+        +phoneNumber: String
+        +address: String
+        +emergencyContact: String
+    }
+
+    class Trainer {
+        +specialization: String
+        +bio: String
+        +certification: String
+        +rating: Double
+    }
+
+    class UserSubscription {
+        +id: Long
+        +userEmail: String
+        +startDate: LocalDateTime
+        +endDate: LocalDateTime
+        +isActive: Boolean
+        +remainingVisits: Integer
+    }
+
+    class Subscription {
+        +id: Long
+        +name: String
+        +description: String
+        +price: BigDecimal
+        +duration: Integer
+        +visitsAllowed: Integer
+    }
+
+    class WorkoutBooking {
+        +id: Long
+        +trainingSessionId: Long
+        +clientId: Long
+        +trainerId: Long
+        +createdAt: LocalDateTime
+        +updatedAt: LocalDateTime
+    }
+}
+
+' Relationships
+User <|-- Client
+User <|-- Trainer
+
+Client "1" -- "0..*" WorkoutBooking : makes >
+Trainer "1" -- "0..*" WorkoutBooking : conducts >
+
+UserSubscription "0..*" -- "1" Subscription : has >
+UserSubscription "1" -- "1" User : belongs to >
+
+' Enums
+enum UserRole {
+    ROLE_ADMIN
+    ROLE_TRAINER
+    ROLE_CLIENT
+}
+
+@enduml 

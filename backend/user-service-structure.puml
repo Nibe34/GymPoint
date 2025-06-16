@@ -1,0 +1,114 @@
+@startuml UserService N-Tier Architecture
+
+!define RECTANGLE class
+
+skinparam componentStyle rectangle
+skinparam linetype ortho
+skinparam backgroundColor white
+
+skinparam package {
+    BackgroundColor LightBlue
+    BorderColor DarkBlue
+}
+
+skinparam component {
+    BackgroundColor LightGreen
+    BorderColor DarkGreen
+}
+
+skinparam database {
+    BackgroundColor LightYellow
+    BorderColor DarkYellow
+}
+
+' Main Layers
+package "Presentation Layer" as presentation {
+    [UserController] as controller
+    note right of controller
+      Handles HTTP requests
+      Input validation
+      Response formatting
+    end note
+}
+
+package "Business Layer" as business {
+    [UserService] as service
+    note right of service
+      Business logic
+      Transaction management
+      Service orchestration
+    end note
+}
+
+package "Data Access Layer" as data {
+    [UserRepository] as repository
+    note right of repository
+      Database operations
+      CRUD operations
+      Query execution
+    end note
+}
+
+database "Database" as db
+
+' Supporting Components
+package "Security" as security {
+    [SecurityConfig] as securityConfig
+    [JwtService] as jwtService
+}
+
+package "Mapping Layer" as mapping {
+    [UserMapper\n(MapStruct)] as mapper
+    note right of mapper
+      DTO ↔ Entity
+      conversion
+    end note
+}
+
+' Data Models
+package "Data Models" as models {
+    package "DTOs" as dtos {
+        [UserDto] as dto
+        [UserCreateDto] as createDto
+        [ClientDto] as clientDto
+        [TrainerDto] as trainerDto
+        [AdminDto] as adminDto
+    }
+    
+    package "Entities" as domain {
+        [User] as entity
+        [Client] as clientEntity
+        [Trainer] as trainerEntity
+        [Admin] as adminEntity
+    }
+}
+
+' Vertical Relationships
+controller --> service
+service --> repository
+repository --> db
+
+' Security Relationships
+controller ..> securityConfig
+service ..> jwtService
+
+' DTO and Entity Relationships
+controller --> dto
+controller --> createDto
+
+service --> entity
+service --> clientEntity
+service --> trainerEntity
+service --> adminEntity
+
+mapper --> dto
+mapper --> entity
+mapper --> clientEntity
+mapper --> trainerEntity
+mapper --> adminEntity
+
+' Layout
+security -[hidden]d- mapping
+dtos -[hidden]d- domain
+
+@enduml 

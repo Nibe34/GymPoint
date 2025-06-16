@@ -1,0 +1,93 @@
+@startuml JWT Authentication Flow
+
+!define RECTANGLE class
+
+skinparam sequence {
+    ArrowColor DarkBlue
+    ActorBorderColor DarkBlue
+    LifeLineBorderColor DarkBlue
+    LifeLineBackgroundColor LightBlue
+    
+    ParticipantBorderColor DarkBlue
+    ParticipantBackgroundColor LightBlue
+    ParticipantFontName Impact
+    ParticipantFontSize 17
+    ParticipantFontStyle Bold
+    
+    ActorBackgroundColor LightBlue
+    ActorFontStyle Bold
+    ActorFontSize 17
+    ActorFontName Impact
+}
+
+actor Client
+participant "API Gateway" as Gateway
+participant "Auth Service" as Auth
+participant "User Service" as User
+participant "Workout Service" as Workout
+participant "Subscription Service" as Subscription
+
+== Initial Authentication ==
+
+Client -> Auth: POST /api/auth/login\n{email, password}
+activate Auth
+
+Auth -> Auth: Validate credentials
+Auth -> Auth: Generate JWT\n(header.payload.signature)
+note right of Auth
+  JWT Claims:
+  - sub (user id)
+  - roles
+  - exp (expiration)
+  - iat (issued at)
+end note
+
+Auth --> Client: 200 OK\n{access_token, token_type}
+deactivate Auth
+
+== Protected Resource Access ==
+
+Client -> Gateway: GET /api/workouts\nAuthorization: Bearer {token}
+activate Gateway
+
+Gateway -> Gateway: Extract JWT from header
+Gateway -> Gateway: Validate JWT signature
+Gateway -> Gateway: Verify expiration
+Gateway -> Gateway: Extract claims
+
+alt Token Valid
+    Gateway -> Workout: Forward request with user info
+    activate Workout
+    Workout -> Workout: Process request
+    Workout --> Gateway: Response
+    deactivate Workout
+    Gateway --> Client: 200 OK
+else Token Invalid
+    Gateway --> Client: 401 Unauthorized
+end
+
+deactivate Gateway
+
+== Service-to-Service Communication ==
+
+Workout -> User: GET /api/users/{id}\nAuthorization: Bearer {token}
+activate User
+
+User -> User: Validate JWT
+User -> User: Extract user info
+User --> Workout: User details
+
+deactivate User
+
+== Token Refresh (Optional) ==
+
+Client -> Auth: POST /api/auth/refresh\n{refresh_token}
+activate Auth
+
+Auth -> Auth: Validate refresh token
+Auth -> Auth: Generate new JWT
+Auth --> Client: 200 OK\n{access_token, token_type}
+
+deactivate Auth
+
+@enduml 

@@ -1,0 +1,88 @@
+@startuml Security Architecture
+
+' External Layer
+actor "Client" as client
+
+' Security Layer
+package "Security Layer" {
+    [API Gateway] as gateway
+    [JWT Validation] as jwt
+    [Role-Based Access Control] as rbac
+    [Request Rate Limiting] as rate
+    [Audit Logging] as audit
+}
+
+' Service Layer
+package "Microservices" {
+    [Auth Service] as auth
+    [User Service] as user
+    [Workout Service] as workout
+    [Subscription Service] as sub
+    [Training Service] as training
+}
+
+' Database Layer
+package "Databases" {
+    database "User DB" as userdb
+    database "Workout DB" as workoutdb
+    database "Subscription DB" as subdb
+    database "Audit Logs" as auditdb
+}
+
+' Security Components
+package "Security Components" {
+    [JWT Token] as token
+    [Roles] as roles
+    [Permissions] as perms
+}
+
+' Connections
+client --> gateway : HTTPS
+gateway --> jwt : Validate
+gateway --> rbac : Check
+gateway --> rate : Limit
+gateway --> audit : Log
+
+gateway --> auth : JWT
+gateway --> user : JWT
+gateway --> workout : JWT
+gateway --> sub : JWT
+gateway --> training : JWT
+
+auth --> userdb
+user --> userdb
+workout --> workoutdb
+sub --> subdb
+audit --> auditdb
+
+' Security Notes
+note right of gateway
+  Security Features:
+  - HTTPS/TLS
+  - JWT Validation
+  - Rate Limiting
+  - Request Filtering
+end note
+
+note right of jwt
+  JWT Validation:
+  - Signature Check
+  - Expiration Check
+  - Claims Validation
+end note
+
+note right of rbac
+  Access Control:
+  - Role Verification
+  - Permission Check
+  - Resource Authorization
+end note
+
+note right of audit
+  Audit Logging:
+  - Request Tracking
+  - Security Events
+  - User Actions
+end note
+
+@enduml 

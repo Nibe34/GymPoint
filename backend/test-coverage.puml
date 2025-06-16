@@ -1,0 +1,130 @@
+@startuml Test Coverage
+
+skinparam sequence {
+    ArrowColor DarkBlue
+    ActorBorderColor DarkBlue
+    LifeLineBorderColor DarkBlue
+    LifeLineBackgroundColor LightBlue
+    
+    ParticipantBorderColor DarkBlue
+    ParticipantBackgroundColor LightBlue
+    ParticipantFontName Impact
+    ParticipantFontSize 17
+    ParticipantFontStyle Bold
+    
+    ActorBackgroundColor LightBlue
+    ActorFontStyle Bold
+    ActorFontSize 17
+    ActorFontName Impact
+}
+
+actor "Test Coverage" as coverage
+
+participant "Auth Service\n(85%)" as auth
+participant "User Service\n(75%)" as user
+participant "Workout Service\n(70%)" as workout
+participant "Training Service\n(80%)" as training
+participant "Subscription Service\n(65%)" as sub
+participant "Common\n(60%)" as common
+
+== Unit Tests ==
+coverage -> auth : Unit Tests
+activate auth
+auth --> coverage : 40%
+deactivate auth
+
+coverage -> user : Unit Tests
+activate user
+user --> coverage : 35%
+deactivate user
+
+coverage -> workout : Unit Tests
+activate workout
+workout --> coverage : 30%
+deactivate workout
+
+coverage -> training : Unit Tests
+activate training
+training --> coverage : 35%
+deactivate training
+
+coverage -> sub : Unit Tests
+activate sub
+sub --> coverage : 25%
+deactivate sub
+
+coverage -> common : Unit Tests
+activate common
+common --> coverage : 20%
+deactivate common
+
+== Integration Tests ==
+coverage -> auth : Integration Tests
+activate auth
+auth --> coverage : 30%
+deactivate auth
+
+coverage -> user : Integration Tests
+activate user
+user --> coverage : 25%
+deactivate user
+
+coverage -> workout : Integration Tests
+activate workout
+workout --> coverage : 25%
+deactivate workout
+
+coverage -> training : Integration Tests
+activate training
+training --> coverage : 30%
+deactivate training
+
+coverage -> sub : Integration Tests
+activate sub
+sub --> coverage : 25%
+deactivate sub
+
+coverage -> common : Integration Tests
+activate common
+common --> coverage : 25%
+deactivate common
+
+== Security Tests ==
+coverage -> auth : Security Tests
+activate auth
+auth --> coverage : 15%
+deactivate auth
+
+coverage -> user : Security Tests
+activate user
+user --> coverage : 15%
+deactivate user
+
+coverage -> workout : Security Tests
+activate workout
+workout --> coverage : 15%
+deactivate workout
+
+coverage -> training : Security Tests
+activate training
+training --> coverage : 15%
+deactivate training
+
+coverage -> sub : Security Tests
+activate sub
+sub --> coverage : 15%
+deactivate sub
+
+coverage -> common : Security Tests
+activate common
+common --> coverage : 15%
+deactivate common
+
+note right of coverage
+  Coverage Breakdown:
+  - Unit Tests: 30-40%
+  - Integration Tests: 25-30%
+  - Security Tests: 15%
+end note
+
+@enduml 

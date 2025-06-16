@@ -1,0 +1,74 @@
+@startuml Access Control Matrix
+
+!define TABLE(name) class name as "name" << (T,#FFAAAA) >>
+!define MASTER_INDEX_COLUMN_PROPERTIES #back:lightgreen
+!define MASTER_INDEX_ROW_PROPERTIES #back:lightgreen
+
+skinparam class {
+    BackgroundColor White
+    ArrowColor Black
+    BorderColor Black
+}
+
+skinparam linetype ortho
+
+class "Access Control Matrix" {
+    + Role
+    + Training Management
+    + User Management
+    + Subscription Management
+    + Reviews
+}
+
+class "CLIENT" {
+    + Role: CLIENT
+    + View Schedule: ✅
+    + Book Workouts: ✅
+    + View Profiles: ✅
+    + View Subscriptions: ✅
+    + Create Reviews: ✅
+    + View Reviews: ✅
+}
+
+class "TRAINER" {
+    + Role: TRAINER
+    + View Schedule: ✅
+    + Create Sessions: ✅
+    + Manage Types: ✅
+    + View Profiles: ✅
+    + View Subscriptions: ✅
+    + View Reviews: ✅
+}
+
+class "ADMIN" {
+    + Role: ADMIN
+    + View Schedule: ✅
+    + Create Sessions: ✅
+    + Manage Types: ✅
+    + View Profiles: ✅
+    + Manage Users: ✅
+    + Manage Trainers: ✅
+    + View Subscriptions: ✅
+    + Manage Subscriptions: ✅
+    + View Reviews: ✅
+}
+
+class "SUPERADMIN" {
+    + Role: SUPERADMIN
+    + View Schedule: ✅
+    + Create Sessions: ✅
+    + Manage Types: ✅
+    + View Profiles: ✅
+    + Manage Users: ✅
+    + Manage Trainers: ✅
+    + View Subscriptions: ✅
+    + Manage Subscriptions: ✅
+    + View Reviews: ✅
+}
+
+note right of "Access Control Matrix"
+  ✅ - Has permission
+  ❌ - No permission
+end note
+
+@enduml 

@@ -1,0 +1,60 @@
+@startuml JWT Token Structure
+
+!define RECTANGLE class
+
+skinparam componentStyle rectangle
+skinparam linetype ortho
+skinparam backgroundColor white
+
+skinparam package {
+    BackgroundColor LightBlue
+    BorderColor DarkBlue
+}
+
+skinparam component {
+    BackgroundColor LightGreen
+    BorderColor DarkGreen
+}
+
+skinparam database {
+    BackgroundColor LightYellow
+    BorderColor DarkYellow
+}
+
+package "JWT Token" as jwt {
+    package "Header" as header {
+        [alg: "HS256"] as alg
+        [typ: "JWT"] as typ
+    }
+    
+    package "Payload" as payload {
+        [sub: "123"] as sub
+        [role: "ROLE_CLIENT"] as role
+        [email: "user@example.com"] as email
+        [exp: "1735689600"] as exp
+        [iat: "1735686000"] as iat
+    }
+    
+    package "Signature" as signature {
+        [HMACSHA256(\nbase64UrlEncode(header) + "." +\nbase64UrlEncode(payload),\nsecret)] as sig
+    }
+}
+
+note right of header
+  Base64Url encoded
+end note
+
+note right of payload
+  Base64Url encoded
+end note
+
+note right of signature
+  HMAC SHA256
+  with secret key
+end note
+
+note bottom of jwt
+  Format: header.payload.signature
+end note
+
+@enduml 

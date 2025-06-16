@@ -1,0 +1,116 @@
+@startuml GymPoint Microservices Architecture
+
+!define RECTANGLE class
+
+skinparam componentStyle rectangle
+skinparam linetype ortho
+skinparam backgroundColor white
+skinparam component {
+    BackgroundColor LightBlue
+    BorderColor DarkBlue
+}
+
+skinparam database {
+    BackgroundColor LightGreen
+    BorderColor DarkGreen
+}
+
+skinparam cloud {
+    BackgroundColor LightGray
+    BorderColor DarkGray
+}
+
+' External Systems
+cloud "Client Applications" as client {
+    [Web Application] as web
+    [Mobile Application] as mobile
+}
+
+' API Gateway
+package "API Gateway" as gateway {
+    [Spring Cloud Gateway] as apiGateway
+}
+
+' Service Registry
+package "Service Registry" as registry {
+    [Eureka Server] as eureka
+}
+
+' Common Components
+package "Common Components" as common {
+    [gympoint-common] as commonLib
+    [common-dto] as commonDto
+}
+
+' Microservices
+package "User Management" as userService {
+    [User Service] as user
+    database "Database" as db
+}
+
+package "Authentication" as authService {
+    [Auth Service] as auth
+}
+
+package "Workout Management" as workoutService {
+    [Workout Service] as workout
+}
+
+package "Training Management" as trainingService {
+    [Training Service] as training
+}
+
+package "Subscription Management" as subscriptionService {
+    [Subscription Service] as subscription
+}
+
+' Relationships
+client --> apiGateway : HTTP/HTTPS
+apiGateway --> eureka : Service Discovery
+
+' Service Dependencies
+apiGateway --> user : REST
+apiGateway --> auth : REST
+apiGateway --> workout : REST
+apiGateway --> training : REST
+apiGateway --> subscription : REST
+
+' Common Dependencies
+user ..> commonLib : Uses
+user ..> commonDto : Uses
+auth ..> commonLib : Uses
+auth ..> commonDto : Uses
+workout ..> commonLib : Uses
+workout ..> commonDto : Uses
+training ..> commonLib : Uses
+training ..> commonDto : Uses
+subscription ..> commonLib : Uses
+subscription ..> commonDto : Uses
+
+' Service Interactions
+user ..> auth : JWT Validation
+workout ..> user : User Info
+training ..> user : User Info
+subscription ..> user : User Info
+
+note right of apiGateway
+  Handles:
+  - Routing
+  - Load Balancing
+  - Security
+  - Rate Limiting
+end note
+
+note right of eureka
+  Service Discovery
+  and Registration
+end note
+
+note right of common
+  Shared:
+  - Utilities
+  - DTOs
+  - Common Configurations
+end note
+
+@enduml 

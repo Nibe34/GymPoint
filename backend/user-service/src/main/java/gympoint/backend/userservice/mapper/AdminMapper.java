@@ -15,6 +15,8 @@ public class AdminMapper implements GenericMapper<Admin, AdminDto, AdminCreateDt
         dto.setFirstName(entity.getFirstName());
         dto.setLastName(entity.getLastName());
         dto.setRole(entity.getRole());
+        dto.setDepartment(entity.getDepartment());
+        dto.setPosition(entity.getPosition());
         return dto;
     }
 
@@ -26,6 +28,8 @@ public class AdminMapper implements GenericMapper<Admin, AdminDto, AdminCreateDt
         entity.setFirstName(createDto.getFirstName());
         entity.setLastName(createDto.getLastName());
         entity.setRole(createDto.getRole());
+        entity.setDepartment(createDto.getDepartment());
+        entity.setPosition(createDto.getPosition());
         return entity;
     }
 
@@ -36,6 +40,8 @@ public class AdminMapper implements GenericMapper<Admin, AdminDto, AdminCreateDt
         existingEntity.setFirstName(updateDto.getFirstName());
         existingEntity.setLastName(updateDto.getLastName());
         existingEntity.setRole(updateDto.getRole());
+        existingEntity.setDepartment(updateDto.getDepartment());
+        existingEntity.setPosition(updateDto.getPosition());
         return existingEntity;
     }
 } 

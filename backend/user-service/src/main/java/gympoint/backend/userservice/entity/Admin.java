@@ -14,7 +14,9 @@ import lombok.Setter;
 @Setter
 @EqualsAndHashCode(callSuper = true)
 public class Admin extends User {
+    @Column(name = "department")
+    private String department;
 
-
-
+    @Column(name = "position")
+    private String position;
 }
